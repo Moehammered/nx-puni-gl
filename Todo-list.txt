@@ -1,0 +1,36 @@
+PORT TO-DO list
+	!!!! High Priority !!!!
+	-OpenGLLoader (DONE)
+	-Input class | GLFW removal (DONE)
+	-Timer class (DONE)
+	-Implement debugging setup procedures {delayed}
+	-Take the textured cube example or simple triangle example and class-ify it
+		>needs its own sub heading once reached, basically Vertex, Transform, Mesh, and VAO implementation
+
+	Render Tasks
+		Transform component
+			Ported easily
+		Vertex structure
+			Ported
+		Mesh object
+			Ported so easily! :D
+		VAO object
+			Ported
+		Shader & Material class
+			!!!!!!!!! Fix the instantiation dependency of gl
+				So that a local variable can be used for it instead of it needing GL init'd beforehand
+			Shader Ported, Material not necessary till texture loading
+				Material should become a specialised class,
+					i.e. ColourMaterial, TextureMaterial, and base Material with simple binding functions
+						also gets given a VertexAttribute array which describes the properties it has,
+							so a Shader + VertexAttribute combo is given, from this the material is built
+		Camera component
+			Ported, not tested for translation and rotation
+				View * Projection tested though.
+
+	[After]
+	-file loading
+	-advanced input polling
+	-debugging functions
+	-text rendering
+

@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "switch",
+            "includePath": [
+                "${workspaceFolder}\\include",
+                "C:\\devkitPro\\libnx\\include",
+                "C:\\devkitPro\\portlibs\\switch\\include",
+                "C:\\devkitPro\\devkitARM\\lib\\gcc\\arm-none-eabi\\9.1.0\\include",
+                "C:\\devkitPro\\devkitARM\\arm-none-eabi\\include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.17763.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.20.27508/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
