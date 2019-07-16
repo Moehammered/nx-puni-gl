@@ -43,6 +43,10 @@ SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
 ROMFS		:=	romfs
+APP_TITLE	:=	nx-puni-gl
+APP_AUTHOR	:=	Moehammered
+APP_VERSION	:=	0.1
+
 
 #---------------------------------------------------------------------------------
 # options for code generation

@@ -10,12 +10,15 @@ PORT TO-DO list
 	Render Tasks
 		Transform component
 			Ported easily
+				Bug fixed with rotation, glm::quat doesn't auto-init to an identity quaternion in portlib implementation of glm.
 		Vertex structure
 			Ported
 		Mesh object
 			Ported so easily! :D
 		VAO object
 			Ported
+		Textures
+			Ported and tested
 		Shader & Material class
 			!!!!!!!!! Fix the instantiation dependency of gl
 				So that a local variable can be used for it instead of it needing GL init'd beforehand
@@ -29,7 +32,7 @@ PORT TO-DO list
 				View * Projection tested though.
 
 	[After]
-	-file loading
+	-file loading (done)
 	-advanced input polling
 	-debugging functions
 	-text rendering

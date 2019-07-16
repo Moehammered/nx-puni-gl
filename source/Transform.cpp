@@ -12,9 +12,9 @@ static std::string glm::Vec3ToString(glm::vec3 const& v3);
 
 puni::Transform::Transform()
 {
-	position = glm::vec3(0);
-	scale = glm::vec3(1);
-	Rotation(glm::quat());
+	position = glm::vec3(0.0f);
+	scale = glm::vec3(1.0f);
+	Rotation(glm::quat(0,0,0,1.0f)); //portlib glm of quat doesn't auto-init to identity quat
 }
 
 
@@ -82,7 +82,8 @@ void puni::Transform::translate(glm::vec3 delta)
 
 void puni::Transform::rotate(glm::vec3 axis, float angle)
 {
-	Rotation(rotation * glm::angleAxis(glm::radians(angle), axis));
+	glm::quat newRot = glm::angleAxis(glm::radians(angle), axis);
+	Rotation(rotation * newRot);
 }
 
 //WORKS!!!! OMG THANK GOD!! --- https://stackoverflow.com/questions/18151845/converting-glmlookat-matrix-to-quaternion-and-back

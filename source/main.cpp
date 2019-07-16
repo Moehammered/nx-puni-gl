@@ -6,14 +6,14 @@
 #include <EGL/egl.h>    // EGL library
 #include <EGL/eglext.h> // EGL extensions
 #include <glad/glad.h>  // glad library (OpenGL loader)
-#define GLM_FORCE_PURE
+// #define GLM_FORCE_PURE
 // #include <glm/vec3.hpp>
 // #include <glm/vec4.hpp>
 // #include <glm/mat4x4.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
+#include "stb_image.h"
 #include "OpenGLLoader.h"
 #include "Input.h"
 #include "Timer.h"
@@ -23,7 +23,7 @@
 #include "FileLoader.h"
 #include "Shader.h"
 #include "Camera.h"
-
+#include "Texture.h"
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
@@ -37,7 +37,7 @@
 #define TRACE(fmt,...) printf("%s: " fmt "\n", __PRETTY_FUNCTION__, ## __VA_ARGS__)
 
 
-constexpr auto TAU = glm::two_pi<float>();
+// constexpr auto TAU = glm::two_pi<float>();
 static int s_nxlinkSock = -1;
 
 unsigned int shaderTransfromLoc;
@@ -45,10 +45,12 @@ puni::Transform triTr;
 puni::Mesh tri;
 puni::VertexArrayObject *vao;
 float movementSpeed = 5;
-std::string vertShaderPath = "romfs:/shaders/VertexColourTransform.vs";
-std::string fragShaderPath = "romfs:/shaders/VertexColourTransform.fs";
+std::string vertShaderPath = "romfs:/shaders/transform-coltex-shader.vs";
+std::string fragShaderPath = "romfs:/shaders/coltex-shader.fs";
+std::string texturePath = "romfs:/awesomeface.png";
 puni::Shader colourShader;
 puni::Camera sceneCam;
+puni::Texture faceImg;
 
 ///extra experiment functions
 void updateTransform(GLuint& trLoc, glm::mat4 mat)
@@ -58,6 +60,11 @@ void updateTransform(GLuint& trLoc, glm::mat4 mat)
 
 void updateInput(puni::Transform& tr, float deltaTime)
 {
+    if(puni::Input::IsKeyHeld(KEY_Y))
+        tr.rotate(glm::vec3(0.0f,0.0f,1.0f), movementSpeed * deltaTime);
+    if(puni::Input::IsKeyHeld(KEY_B))
+        tr.rotate(glm::vec3(0,0,1), -movementSpeed * deltaTime);
+
     if(puni::Input::IsKeyPressed(KEY_X))
         movementSpeed = movementSpeed + 0.5f < 10 ? movementSpeed+0.5f : movementSpeed;
     else if(puni::Input::IsKeyPressed(KEY_B))
@@ -143,6 +150,8 @@ static void sceneInit()
 
     tri = PrimitiveShapes::CreateTriangle();
 
+    faceImg.loadTexture(texturePath);
+
     vao = new puni::VertexArrayObject();
 
     puni::VertexAttributes vertAttribs[] = {
@@ -153,12 +162,16 @@ static void sceneInit()
         {
             1, 3, GL_FLOAT, GL_FALSE, 
             sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::col)
+        },
+        {
+            2, 2, GL_FLOAT, GL_FALSE, 
+            sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::uv)
         }
     };
 
     
     vao->setupBuffers(tri.VertexBufferProperty().data(), tri.VertexBufferProperty().size());
-    vao->setupAttributes(vertAttribs, 2);
+    vao->setupAttributes(vertAttribs, 3);
 
     sceneCam.setAspectRatio(1280.0f,720.0f);
     sceneCam.setClippingPlanes(0.01f, 1000.0f);
@@ -176,7 +189,7 @@ static void sceneRender()
     glClear(GL_COLOR_BUFFER_BIT);
 
     colourShader.use();
-
+    faceImg.use();
     vao->bindVAO();
     updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
     glDrawElements(tri.MeshType(), tri.IndexCount(), GL_UNSIGNED_INT, 0);

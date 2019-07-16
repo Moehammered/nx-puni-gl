@@ -1,6 +1,10 @@
 # Prerequisites
 *.d
 
+# extra things to ignore (imgs, data files for testing)
+*.png
+build/*
+
 # Compiled Object files
 *.slo
 *.lo
@@ -27,6 +31,6 @@
 *.lib
 
 # Executables
-*.exe
-*.out
-*.app
+*.nro
+*.elf
+*.nacp
