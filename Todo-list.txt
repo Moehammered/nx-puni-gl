@@ -28,7 +28,7 @@ PORT TO-DO list
 						also gets given a VertexAttribute array which describes the properties it has,
 							so a Shader + VertexAttribute combo is given, from this the material is built
 		Camera component
-			Ported, not tested for translation and rotation
+			Ported
 				View * Projection tested though.
 
 	[After]

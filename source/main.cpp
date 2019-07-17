@@ -24,6 +24,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "ObjectAllocator.h"
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
@@ -51,6 +52,7 @@ std::string texturePath = "romfs:/awesomeface.png";
 puni::Shader colourShader;
 puni::Camera sceneCam;
 puni::Texture faceImg;
+puni::Object* obj;
 
 ///extra experiment functions
 void updateTransform(GLuint& trLoc, glm::mat4 mat)
@@ -181,6 +183,8 @@ static void sceneInit()
     triTr.position = glm::vec3(0,0,-3);
     triTr.scale = glm::vec3(1);
     updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
+
+    obj = &puni::Object::Instantiate<puni::Object>();
 }
 
 static void sceneRender()
@@ -197,6 +201,7 @@ static void sceneRender()
 
 static void sceneExit()
 {
+    puni::ObjectAllocator::Instance()->processDestroyQueue();
 }
 
 int main(int argc, char* argv[])
@@ -252,6 +257,8 @@ int main(int argc, char* argv[])
         eglSwapBuffers(glInstance->Display(), glInstance->Surface());
     }
 
+    //cleanup obj
+    puni::ObjectAllocator::Instance()->addToDestroyQueue(obj);
     // Deinitialize our scene
     sceneExit();
 
