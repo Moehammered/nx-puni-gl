@@ -25,6 +25,7 @@
 #include "Camera.h"
 #include "Texture.h"
 #include "ObjectAllocator.h"
+#include "GameObject.h"
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
@@ -46,6 +47,7 @@ puni::Transform triTr;
 puni::Mesh tri;
 puni::VertexArrayObject *vao;
 float movementSpeed = 5;
+float rotationSpeed = 360;
 std::string vertShaderPath = "romfs:/shaders/transform-coltex-shader.vs";
 std::string fragShaderPath = "romfs:/shaders/coltex-shader.fs";
 std::string texturePath = "romfs:/awesomeface.png";
@@ -53,7 +55,7 @@ puni::Shader colourShader;
 puni::Camera sceneCam;
 puni::Texture faceImg;
 puni::Object* obj;
-
+puni::GameObject testGO;
 ///extra experiment functions
 void updateTransform(GLuint& trLoc, glm::mat4 mat)
 {
@@ -63,9 +65,9 @@ void updateTransform(GLuint& trLoc, glm::mat4 mat)
 void updateInput(puni::Transform& tr, float deltaTime)
 {
     if(puni::Input::IsKeyHeld(KEY_Y))
-        tr.rotate(glm::vec3(0.0f,0.0f,1.0f), movementSpeed * deltaTime);
+        tr.rotate(glm::vec3(0.0f,0.0f,1.0f), rotationSpeed * deltaTime);
     if(puni::Input::IsKeyHeld(KEY_B))
-        tr.rotate(glm::vec3(0,0,1), -movementSpeed * deltaTime);
+        tr.rotate(glm::vec3(0,0,1), -rotationSpeed * deltaTime);
 
     if(puni::Input::IsKeyPressed(KEY_X))
         movementSpeed = movementSpeed + 0.5f < 10 ? movementSpeed+0.5f : movementSpeed;
@@ -185,12 +187,20 @@ static void sceneInit()
     updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
 
     obj = &puni::Object::Instantiate<puni::Object>();
+    testGO = puni::GameObject::Instantiate();
+    testGO.name = "I'm alive!!!";
+    printf("GO info:\n%s\n\n", testGO.toString().c_str());
+
+    glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
 }
 
 static void sceneRender()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     colourShader.use();
     faceImg.use();
@@ -208,7 +218,7 @@ int main(int argc, char* argv[])
 {
     // Set mesa configuration (useful for debugging)
     setMesaConfig();
-
+    stbi_set_flip_vertically_on_load(true);
     // Initialize EGL on the default window
     // Load OpenGL routines using glad
     puni::OpenGLLoader* glInstance = puni::OpenGLLoader::Instance();
@@ -258,6 +268,8 @@ int main(int argc, char* argv[])
     }
 
     //cleanup obj
+    puni::GameObject copyObj = testGO;
+    puni::GameObject::Destroy(copyObj);
     puni::ObjectAllocator::Instance()->addToDestroyQueue(obj);
     // Deinitialize our scene
     sceneExit();

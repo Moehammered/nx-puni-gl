@@ -4,10 +4,10 @@
 namespace puni
 {
 	class ObjectAllocator;
-}
-// class GameObject;
+	class GameObject;
 // class RenderQueue;
 // class ComponentUpdateQueue;
+}
 
 #include "ObjectAllocator.h"
 #include <assert.h>

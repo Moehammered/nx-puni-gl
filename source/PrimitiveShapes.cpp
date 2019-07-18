@@ -8,43 +8,57 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[16];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0.5f, 0.5f);	//FTL
-		//vertices[0].colour = Colour::Blue();
+		vertices[0].col = glm::vec3(1.0f);
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0.5f);//FBL
+		vertices[1].col = glm::vec3(1.0f);
 		vertices[1].uv = glm::vec2(0, 0);
 		vertices[2].pos = glm::vec3(0.5f, 0.5f, 0.5f);	//FTR
+		vertices[2].col = glm::vec3(1.0f);
 		vertices[2].uv = glm::vec2(1, 1);
 		vertices[3].pos = glm::vec3(0.5f, -0.5f, 0.5f);	//FBR
+		vertices[3].col = glm::vec3(1.0f);
 		vertices[3].uv = glm::vec2(1, 0);
 
 		vertices[4].pos = glm::vec3(0.5f, 0.5f, -0.5f);	//BTR
-		//vertices[0].colour = Colour::Blue();
+		vertices[4].col = glm::vec3(1.0f);
 		vertices[4].uv = glm::vec2(0, 1);
 		vertices[5].pos = glm::vec3(0.5f, -0.5f, -0.5f);//BBR
+		vertices[5].col = glm::vec3(1.0f);
 		vertices[5].uv = glm::vec2(0, 0);
 		vertices[6].pos = glm::vec3(-0.5f, 0.5f, -0.5f);//BTL
+		vertices[6].col = glm::vec3(1.0f);
 		vertices[6].uv = glm::vec2(1, 1);
 		vertices[7].pos = glm::vec3(-0.5f, -0.5f, -0.5f);//BBL
+		vertices[7].col = glm::vec3(1.0f);
 		vertices[7].uv = glm::vec2(1, 0);
 
 		//make the top face unique to correct the UVs
 		vertices[8].pos = vertices[6].pos;				//BTL
+		vertices[8].col = glm::vec3(1.0f);
 		vertices[8].uv = glm::vec2(0, 1);
 		vertices[9].pos = vertices[0].pos;				//FTL
+		vertices[9].col = glm::vec3(1.0f);
 		vertices[9].uv = glm::vec2(0, 0);
 		vertices[10].pos = vertices[2].pos;				//FTR
+		vertices[10].col = glm::vec3(1.0f);
 		vertices[10].uv = glm::vec2(1, 0);
 		vertices[11].pos = vertices[4].pos;				//BTR
+		vertices[11].col = glm::vec3(1.0f);
 		vertices[11].uv = glm::vec2(1, 1);
 
 		//make the bottom face unique to correct the UVs
 		vertices[12].pos = vertices[3].pos;				//FBR
+		vertices[12].col = glm::vec3(1.0f);
 		vertices[12].uv = glm::vec2(1, 0);
 		vertices[13].pos = vertices[1].pos;				//FBL
+		vertices[13].col = glm::vec3(1.0f);
 		vertices[13].uv = glm::vec2(0, 0);
 		vertices[14].pos = vertices[7].pos;				//BBL
+		vertices[14].col = glm::vec3(1.0f);
 		vertices[14].uv = glm::vec2(0, 1);
 		vertices[15].pos = vertices[5].pos;				//BBR
+		vertices[15].col = glm::vec3(1.0f);
 		vertices[15].uv = glm::vec2(1, 1);
 
 
@@ -84,7 +98,7 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0.5f, 0); //TL
-		//vertices[0].colour = Colour::Blue();
+		//vertices[0].col = col::Blue();
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0); //BL
 		vertices[1].uv = glm::vec2(0, 0);
@@ -110,7 +124,7 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0, -0.5f); //TL
-		//vertices[0].colour = Colour::Blue();
+		//vertices[0].col = col::Blue();
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, 0, 0.5f); //BL
 		vertices[1].uv = glm::vec2(0, 0);
@@ -136,7 +150,7 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[3];
 		//setup the positions
 		vertices[0].pos = glm::vec3(0, 0.5f, 0); //TM
-		//vertices[0].colour = Colour::Blue();
+		//vertices[0].col = col::Blue();
 		vertices[0].uv = glm::vec2(0.5f, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0); //BL
 		vertices[1].uv = glm::vec2(0, 0);
@@ -170,43 +184,57 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[16];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0.5f, 0.5f);	//FTL
-		//vertices[0].colour = Colour::Blue();
+		vertices[0].col = glm::vec3(1.0f);
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0.5f);//FBL
+		vertices[1].col = glm::vec3(1.0f);
 		vertices[1].uv = glm::vec2(0, 0);
 		vertices[2].pos = glm::vec3(0.5f, 0.5f, 0.5f);	//FTR
+		vertices[2].col = glm::vec3(1.0f);
 		vertices[2].uv = glm::vec2(1, 1);
 		vertices[3].pos = glm::vec3(0.5f, -0.5f, 0.5f);	//FBR
+		vertices[3].col = glm::vec3(1.0f);
 		vertices[3].uv = glm::vec2(1, 0);
 
 		vertices[4].pos = glm::vec3(0.5f, 0.5f, -0.5f);	//BTR
-		//vertices[0].colour = Colour::Blue();
+		vertices[4].col = glm::vec3(1.0f);
 		vertices[4].uv = glm::vec2(0, 1);
 		vertices[5].pos = glm::vec3(0.5f, -0.5f, -0.5f);//BBR
+		vertices[5].col = glm::vec3(1.0f);
 		vertices[5].uv = glm::vec2(0, 0);
 		vertices[6].pos = glm::vec3(-0.5f, 0.5f, -0.5f);//BTL
+		vertices[6].col = glm::vec3(1.0f);
 		vertices[6].uv = glm::vec2(1, 1);
 		vertices[7].pos = glm::vec3(-0.5f, -0.5f, -0.5f);//BBL
+		vertices[7].col = glm::vec3(1.0f);
 		vertices[7].uv = glm::vec2(1, 0);
 
 		//make the top face unique to correct the UVs
 		vertices[8].pos = vertices[6].pos;				//BTL
+		vertices[8].col = glm::vec3(1.0f);
 		vertices[8].uv = glm::vec2(0, 1);
 		vertices[9].pos = vertices[0].pos;				//FTL
+		vertices[9].col = glm::vec3(1.0f);
 		vertices[9].uv = glm::vec2(0, 0);
 		vertices[10].pos = vertices[2].pos;				//FTR
+		vertices[10].col = glm::vec3(1.0f);
 		vertices[10].uv = glm::vec2(1, 0);
 		vertices[11].pos = vertices[4].pos;				//BTR
+		vertices[11].col = glm::vec3(1.0f);
 		vertices[11].uv = glm::vec2(1, 1);
 
 		//make the bottom face unique to correct the UVs
 		vertices[12].pos = vertices[3].pos;				//FBR
+		vertices[12].col = glm::vec3(1.0f);
 		vertices[12].uv = glm::vec2(1, 0);
 		vertices[13].pos = vertices[1].pos;				//FBL
+		vertices[13].col = glm::vec3(1.0f);
 		vertices[13].uv = glm::vec2(0, 0);
 		vertices[14].pos = vertices[7].pos;				//BBL
+		vertices[14].col = glm::vec3(1.0f);
 		vertices[14].uv = glm::vec2(0, 1);
 		vertices[15].pos = vertices[5].pos;				//BBR
+		vertices[15].col = glm::vec3(1.0f);
 		vertices[15].uv = glm::vec2(1, 1);
 
 
@@ -249,7 +277,7 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0.5f, 0); //TL
-		//vertices[0].colour = Colour::Blue();
+		//vertices[0].col = col::Blue();
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0); //BL
 		vertices[1].uv = glm::vec2(0, 0);
@@ -278,7 +306,7 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0, -0.5f); //TL
-		//vertices[0].colour = Colour::Blue();
+		//vertices[0].col = col::Blue();
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, 0, 0.5f); //BL
 		vertices[1].uv = glm::vec2(0, 0);
