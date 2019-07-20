@@ -31,6 +31,10 @@ PORT TO-DO list
 			Ported
 				View * Projection tested though.
 
+	Entity Component Architecture
+		Port render and update components, along with update services for the respective components.
+			Component, UpdateableComponent and GameObject ported over.
+
 	[After]
 	-file loading (done)
 	-advanced input polling

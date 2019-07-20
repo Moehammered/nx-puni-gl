@@ -1,5 +1,5 @@
-#ifndef CAMERA__H_
-#define CAMERA__H_
+#ifndef SWITCH__CAMERA__H_
+#define SWITCH__CAMERA__H_
 
 #include <glm\glm.hpp>
 #include "Transform.h"

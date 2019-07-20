@@ -26,6 +26,8 @@
 #include "Texture.h"
 #include "ObjectAllocator.h"
 #include "GameObject.h"
+#include "UpdateableComponent.h"
+#include "ComponentUpdateQueue.h"
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
@@ -188,8 +190,9 @@ static void sceneInit()
 
     obj = &puni::Object::Instantiate<puni::Object>();
     testGO = puni::GameObject::Instantiate();
-    testGO.name = "I'm alive!!!";
-    printf("GO info:\n%s\n\n", testGO.toString().c_str());
+    testGO->name = "I'm alive!!!";
+    testGO->AddComponent<puni::UpdateableComponent>();
+    printf("GO info:\n%s\n\n", testGO->toString().c_str());
 
     glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -241,7 +244,8 @@ int main(int argc, char* argv[])
 
     puni::Input::Initialise();
     puni::Timer::Tick();
-    // Main graphics loop
+    puni::ComponentUpdateQueue* cpqueue = puni::ComponentUpdateQueue::Instance();
+    // Main graphics loop    
     while (appletMainLoop())
     {
         // Get and process input
@@ -261,7 +265,7 @@ int main(int argc, char* argv[])
         }
 
         updateInput(triTr, puni::Timer::DeltaTime());
-
+        cpqueue->updateComponents();
         // Render stuff!
         sceneRender();
         eglSwapBuffers(glInstance->Display(), glInstance->Surface());
@@ -273,7 +277,7 @@ int main(int argc, char* argv[])
     puni::ObjectAllocator::Instance()->addToDestroyQueue(obj);
     // Deinitialize our scene
     sceneExit();
-
+    puni::ObjectAllocator::Instance()->processDestroyQueue();
     // Deinitialize EGL
     glInstance->DestroySelf();
     //deinitEgl();

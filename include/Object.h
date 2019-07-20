@@ -20,7 +20,7 @@ namespace puni
 	public:
 		friend class ObjectAllocator;
 		// friend class RenderQueue;
-		// friend class ComponentUpdateQueue;
+		friend class ComponentUpdateQueue;
 		virtual void initialise();
 		virtual void cleanup();
 

@@ -1,5 +1,5 @@
-#ifndef COMPONENT__H_
-#define COMPONENT__H_
+#ifndef SWITCH__COMPONENT__H_
+#define SWITCH__COMPONENT__H_
 
 namespace puni
 {

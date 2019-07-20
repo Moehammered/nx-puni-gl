@@ -1,5 +1,5 @@
-#ifndef GAMEOBJECT__H_
-#define GAMEOBJECT__H_
+#ifndef SWITCH__GAMEOBJECT__H_
+#define SWITCH__GAMEOBJECT__H_
 #pragma once
 
 namespace puni
