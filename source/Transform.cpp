@@ -7,8 +7,7 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
 #include <iostream>
-
-static std::string glm::Vec3ToString(glm::vec3 const& v3);
+#include "glmhelpers.h"
 
 puni::Transform::Transform()
 {
@@ -115,22 +114,6 @@ std::string puni::Transform::toString()
 
 	st.append("\nRight: ");
 	st.append(glm::Vec3ToString(right));
-
-	return st;
-}
-
-
-std::string glm::Vec3ToString(glm::vec3 const& v3)
-{
-	std::string st;
-
-	st.append("(");
-	st.append(std::to_string(v3.x));
-	st.append(", ");
-	st.append(std::to_string(v3.y));
-	st.append(",");
-	st.append(std::to_string(v3.z));
-	st.append(")");
 
 	return st;
 }

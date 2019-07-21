@@ -7,13 +7,13 @@
 #include <EGL/eglext.h> // EGL extensions
 #include <glad/glad.h>  // glad library (OpenGL loader)
 // #define GLM_FORCE_PURE
-// #include <glm/vec3.hpp>
-// #include <glm/vec4.hpp>
-// #include <glm/mat4x4.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
+
+/// my stuff
+
 #include "OpenGLLoader.h"
 #include "Input.h"
 #include "Timer.h"
@@ -28,6 +28,8 @@
 #include "GameObject.h"
 #include "UpdateableComponent.h"
 #include "ComponentUpdateQueue.h"
+#include "Material.h"
+
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
@@ -56,6 +58,8 @@ std::string texturePath = "romfs:/awesomeface.png";
 puni::Shader colourShader;
 puni::Camera sceneCam;
 puni::Texture faceImg;
+puni::Material material;
+
 puni::Object* obj;
 puni::GameObject testGO;
 ///extra experiment functions
@@ -175,9 +179,13 @@ static void sceneInit()
         }
     };
 
+
+    material.loadShader(vertShaderPath, fragShaderPath);
+    material.setTexture(new puni::Texture(texturePath));
+    material.setAttributes(vertAttribs, 3);
     
     vao->setupBuffers(tri.VertexBufferProperty().data(), tri.VertexBufferProperty().size());
-    vao->setupAttributes(vertAttribs, 3);
+    vao->setupAttributes(material.MaterialAttributes().data(), material.MaterialAttributes().size());
 
     sceneCam.setAspectRatio(1280.0f,720.0f);
     sceneCam.setClippingPlanes(0.01f, 1000.0f);
@@ -205,10 +213,12 @@ static void sceneRender()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    colourShader.use();
-    faceImg.use();
+    // colourShader.use();
+    // faceImg.use();
+    material.use();
     vao->bindVAO();
-    updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
+    material.setTransformProperty("transform", sceneCam.ProjView() * triTr.TransformMat4());
+    // updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
     glDrawElements(tri.MeshType(), tri.IndexCount(), GL_UNSIGNED_INT, 0);
 }
 
@@ -277,9 +287,12 @@ int main(int argc, char* argv[])
     puni::ObjectAllocator::Instance()->addToDestroyQueue(obj);
     // Deinitialize our scene
     sceneExit();
+    printf("Double checking object queue.\n\n\n");
     puni::ObjectAllocator::Instance()->processDestroyQueue();
     // Deinitialize EGL
+    printf("Destroying gl instance.\n\n\n");
     glInstance->DestroySelf();
     //deinitEgl();
+    printf("Bye bye.\n\n\n");
     return EXIT_SUCCESS;
 }

@@ -14,15 +14,15 @@ namespace puni
 			Mesh(const Mesh& mesh);
 			virtual ~Mesh();
 
-			virtual void setVertices(const Vertex * vertices, int vertexCount);
-			virtual void setIndices(const int * indices, int indexCount);
+			virtual void setVertices(const Vertex * vertices, unsigned int vertexCount);
+			virtual void setIndices(const int * indices, unsigned int indexCount);
 			void useTriangleList();
 			void useTriangleStrip();
 			void forceBufferPropertyUpdate();
 
-			int IndexCount();
-			int VertexCount();
-			int TriangleCount();
+			unsigned int IndexCount();
+			unsigned int VertexCount();
+			unsigned int TriangleCount();
 			int MeshType();
 			const std::vector<BufferProperty> VertexBufferProperty() const;
 

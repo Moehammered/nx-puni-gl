@@ -18,11 +18,11 @@ void puni::ObjectAllocator::addToDestroyQueue(Object * obj)
 
 void puni::ObjectAllocator::processDestroyQueue()
 {
-	for (int i = 0; i < destroyQueue.size(); ++i)
+	for (unsigned long i = 0; i < destroyQueue.size(); ++i)
 	{
 		if (destroyQueue[i] != nullptr)
 		{
-			for (int k = 0; k < instanceList.size(); ++k)
+			for (unsigned long k = 0; k < instanceList.size(); ++k)
 			{
 				if (instanceList[k]->id == destroyQueue[i]->id)
 				{
@@ -46,7 +46,7 @@ puni::ObjectAllocator::ObjectAllocator()
 
 puni::ObjectAllocator::~ObjectAllocator()
 {
-	for (int i = 0; i < instanceList.size(); ++i)
+	for (unsigned long i = 0; i < instanceList.size(); ++i)
 	{
 		delete instanceList[i];
 	}

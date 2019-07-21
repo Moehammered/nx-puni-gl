@@ -5,12 +5,6 @@
 #include <glm\gtc\quaternion.hpp>
 #include <string>
 
-///expand functionality of glm in here
-namespace glm
-{
-	static std::string Vec3ToString(glm::vec3 const& v3);
-}
-
 namespace puni
 {
 	class Transform

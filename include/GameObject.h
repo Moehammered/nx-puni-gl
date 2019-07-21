@@ -4,7 +4,7 @@
 
 namespace puni
 {
-	class Component; //resolve cyclical dependency (forward decleration)
+	class Component; 
 }
 
 #include "Object.h"
@@ -68,7 +68,12 @@ namespace puni
 		static void processActiveState();
 	};
 
+}
 
+#include "Component.h"
+
+namespace puni
+{
 	template<class C>
 	inline C* const GameObject::AddComponent()
 	{
@@ -80,9 +85,6 @@ namespace puni
 		return comp;
 	}
 }
-
-
-#include "Component.h"
 
 #endif
 
