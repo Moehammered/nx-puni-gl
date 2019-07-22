@@ -3,10 +3,12 @@
 #include <glad\glad.h>
 #include <glm\gtc\type_ptr.hpp>
 #include "Vertex.h"
+#include <stdio.h>
 
 puni::Material::Material()
 {
 	//shader = new Shader("transform-coltex-shader.vs", "coltex-shader.fs");
+	shader = 0;
 	createDefaultAttributes();
 }
 
@@ -38,10 +40,13 @@ void puni::Material::loadShader(std::string vertP, std::string fragP)
 {
 	if(shader)
 	{
+		printf("deleting material shader...\n\n");
 		delete shader;
 		shader = 0;
 	}
+	printf("making material shader...\n\n");
 	shader = new Shader();
+	printf("compiling material shader...\n\n");
 	shader->compile(vertP, fragP);
 }
 

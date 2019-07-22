@@ -45,7 +45,7 @@ INCLUDES	:=	include
 ROMFS		:=	romfs
 APP_TITLE	:=	nx-puni-gl
 APP_AUTHOR	:=	Moehammered
-APP_VERSION	:=	0.2.8
+APP_VERSION	:=	0.2.9
 
 
 #---------------------------------------------------------------------------------

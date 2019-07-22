@@ -10,7 +10,7 @@ namespace puni
 	{
 	public:
 		friend class UpdateableComponent;
-		// friend class FPSMovementComponent;
+		friend class FPSMovementComponent;
 		static ComponentUpdateQueue* const Instance();
 
 		void updateComponents();

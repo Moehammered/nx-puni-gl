@@ -30,7 +30,7 @@ void puni::GameObject::Destroy(GameObject& go)
 	if (go._instance != nullptr)
 	{
 		ObjectAllocator::Instance()->addToDestroyQueue(go._instance);
-		for (int i = 0; i < go->components.size(); ++i)
+		for (unsigned long i = 0; i < go->components.size(); ++i)
 		{
 			ObjectAllocator::Instance()->addToDestroyQueue(go->components[i]);
 		}
@@ -89,10 +89,10 @@ void puni::GameObject::printReferenceInfo()
 	}
 	else
 	{
-		printf("[%s]GameObject container(ID:%i) has %i copies.\n", _instance->name.c_str(), id, copies.size());
-		for (int i = 0; i < copies.size(); ++i)
+		printf("[%s]GameObject container(ID:%lu) has %lu copies.\n", _instance->name.c_str(), id, copies.size());
+		for (unsigned long i = 0; i < copies.size(); ++i)
 		{
-			printf("Copy(#%i): (%s) {Container ID: %i}\n", i + 1, copies[i]->_instance->toString().c_str(), id);
+			printf("Copy(#%lu): (%s) {Container ID: %lu}\n", i + 1, copies[i]->_instance->toString().c_str(), id);
 		}
 	}
 }
@@ -158,9 +158,9 @@ void puni::GameObject::addToDisableQueue(unsigned int ID)
 void puni::GameObject::processActiveState()
 {
 	//go through and enable
-	for (int i = 0; i < enableObjectQueue.size(); ++i)
+	for (unsigned long i = 0; i < enableObjectQueue.size(); ++i)
 	{
-		for (int k = 0; k < inactiveObjects.size(); ++k)
+		for (unsigned long k = 0; k < inactiveObjects.size(); ++k)
 		{
 			if (inactiveObjects[k]->id == enableObjectQueue[i])
 			{
@@ -172,9 +172,9 @@ void puni::GameObject::processActiveState()
 	}
 
 	//go through and disable now
-	for (int i = 0; i < disableObjectQueue.size(); ++i)
+	for (unsigned long i = 0; i < disableObjectQueue.size(); ++i)
 	{
-		for (int k = 0; k < activeObjects.size(); ++k)
+		for (unsigned long k = 0; k < activeObjects.size(); ++k)
 		{
 			if (activeObjects[k]->id == disableObjectQueue[i])
 			{

@@ -28,7 +28,10 @@
 #include "GameObject.h"
 #include "UpdateableComponent.h"
 #include "ComponentUpdateQueue.h"
+#include "RenderQueue.h"
 #include "Material.h"
+#include "FPSMovementComponent.h"
+#include "MeshRendererComponent.h"
 
 //-----------------------------------------------------------------------------
 // nxlink support
@@ -199,8 +202,19 @@ static void sceneInit()
     obj = &puni::Object::Instantiate<puni::Object>();
     testGO = puni::GameObject::Instantiate();
     testGO->name = "I'm alive!!!";
-    testGO->AddComponent<puni::UpdateableComponent>();
+    printf("Adding fps component\n\n");
+    puni::FPSMovementComponent* fpsC = testGO->AddComponent<puni::FPSMovementComponent>();
+    fpsC->initialise();
+    fpsC->movementSpeed = 10;
+    printf("Adding render component\n\n");
+    puni::MeshRendererComponent* mrend = testGO->AddComponent<puni::MeshRendererComponent>();
+    printf("initialising render component\n\n");
+    mrend->initialise();
+    mrend->material->loadShader(vertShaderPath, fragShaderPath);
+    printf("updating material attrib in component\n\n");
+    mrend->updateMaterialAttributes(vertAttribs, 3);
     printf("GO info:\n%s\n\n", testGO->toString().c_str());
+    testGO->transform.position = glm::vec3(0,-1, -4);
 
     glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -255,6 +269,7 @@ int main(int argc, char* argv[])
     puni::Input::Initialise();
     puni::Timer::Tick();
     puni::ComponentUpdateQueue* cpqueue = puni::ComponentUpdateQueue::Instance();
+    puni::RenderQueue* rqueue = puni::RenderQueue::Instance();
     // Main graphics loop    
     while (appletMainLoop())
     {
@@ -278,6 +293,7 @@ int main(int argc, char* argv[])
         cpqueue->updateComponents();
         // Render stuff!
         sceneRender();
+        rqueue->processRenderQueue();
         eglSwapBuffers(glInstance->Display(), glInstance->Surface());
     }
 
