@@ -7,14 +7,14 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
 #include <iostream>
-
-static std::string glm::Vec3ToString(glm::vec3 const& v3);
+#include <glm/gtx/string_cast.hpp>
 
 puni::Transform::Transform()
 {
 	position = glm::vec3(0.0f);
 	scale = glm::vec3(1.0f);
-	Rotation(glm::quat(0,0,0,1.0f)); //portlib glm of quat doesn't auto-init to identity quat
+	//portlib glm of quat doesn't auto-init to identity quat
+	Rotation(glm::quat(1.0f,0.0f,0.0f,0.0f)); 
 }
 
 
@@ -97,40 +97,12 @@ std::string puni::Transform::toString()
 {
 	std::string st;
 
-	st.append("Position: (");
-	st.append(std::to_string(position.x));
-	st.append(", ");
-	st.append(std::to_string(position.y));
-	st.append(",");
-	st.append(std::to_string(position.z));
-	st.append(")");
-
-	st.append("\nForward: (");
-	st.append(std::to_string(forward.x));
-	st.append(", ");
-	st.append(std::to_string(forward.y));
-	st.append(",");
-	st.append(std::to_string(forward.z));
-	st.append(")");
-
+	st.append("Position: ");
+	st.append(glm::to_string(position));
+	st.append("\nForward: ");
+	st.append(glm::to_string(forward));
 	st.append("\nRight: ");
-	st.append(glm::Vec3ToString(right));
-
-	return st;
-}
-
-
-std::string glm::Vec3ToString(glm::vec3 const& v3)
-{
-	std::string st;
-
-	st.append("(");
-	st.append(std::to_string(v3.x));
-	st.append(", ");
-	st.append(std::to_string(v3.y));
-	st.append(",");
-	st.append(std::to_string(v3.z));
-	st.append(")");
+	st.append(glm::to_string(right));
 
 	return st;
 }

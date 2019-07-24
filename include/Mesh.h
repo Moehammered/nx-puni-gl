@@ -14,16 +14,16 @@ namespace puni
 			Mesh(const Mesh& mesh);
 			virtual ~Mesh();
 
-			virtual void setVertices(const Vertex * vertices, int vertexCount);
-			virtual void setIndices(const int * indices, int indexCount);
+			virtual void setVertices(const Vertex * vertices, unsigned int vertexCount);
+			virtual void setIndices(const int * indices, unsigned int indexCount);
 			void useTriangleList();
 			void useTriangleStrip();
 			void forceBufferPropertyUpdate();
 
-			int IndexCount();
-			int VertexCount();
-			int TriangleCount();
-			int MeshType();
+			unsigned int IndexCount();
+			unsigned int VertexCount();
+			unsigned int TriangleCount();
+			unsigned int MeshType();
 			const std::vector<BufferProperty> VertexBufferProperty() const;
 
 			const Vertex* const Vertices();
@@ -35,7 +35,7 @@ namespace puni
 			std::vector<int> indices;
 			std::vector<Vertex> vertices;
 			std::vector<BufferProperty> buffers;
-			int triangleCount, meshType;
+			unsigned int triangleCount, meshType;
 
 			void updateBufferProperties();
 

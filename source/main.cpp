@@ -181,6 +181,8 @@ static void sceneInit()
     triTr.position = glm::vec3(0,0,-3);
     triTr.scale = glm::vec3(1);
     updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
+
+    printf("%s\n\n", triTr.toString().c_str());
 }
 
 static void sceneRender()

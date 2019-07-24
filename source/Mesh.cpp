@@ -9,10 +9,10 @@ puni::Mesh::Mesh()
 	meshType = GL_TRIANGLES;
 	BufferProperty bf[] = {
 			{
-				GL_ARRAY_BUFFER, sizeof(Vertex) * VertexCount(), Vertices(), GL_STATIC_DRAW
+				GL_ARRAY_BUFFER, (GLsizeiptr)(sizeof(Vertex) * VertexCount()), Vertices(), GL_STATIC_DRAW
 			},
 			{
-				GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * IndexCount(), Indices(), GL_STATIC_DRAW
+				GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)(sizeof(GLuint) * IndexCount()), Indices(), GL_STATIC_DRAW
 			}
 	};
 	buffers.insert(buffers.begin(), bf, bf + 2);
@@ -44,7 +44,7 @@ puni::Mesh::~Mesh()
 	indices.clear();
 }
 
-void puni::Mesh::setVertices(const Vertex * vertices, int vertexCount)
+void puni::Mesh::setVertices(const Vertex * vertices, unsigned int vertexCount)
 {
 	updateFlag = updateFlag | VERT_BUFFER_DATA_BIT;
 	if (vertexCount > this->vertices.size())
@@ -56,7 +56,7 @@ void puni::Mesh::setVertices(const Vertex * vertices, int vertexCount)
 	updateBufferProperties();
 }
 
-void puni::Mesh::setIndices(const int * indices, int indexCount)
+void puni::Mesh::setIndices(const int * indices, unsigned int indexCount)
 {
 	updateFlag = updateFlag | ELEM_BUFFER_DATA_BIT;
 	if (indexCount > this->indices.size())
@@ -89,22 +89,22 @@ void puni::Mesh::forceBufferPropertyUpdate()
 	updateBufferProperties();
 }
 
-int puni::Mesh::IndexCount()
+unsigned int puni::Mesh::IndexCount()
 {
 	return indices.size();
 }
 
-int puni::Mesh::VertexCount()
+unsigned int puni::Mesh::VertexCount()
 {
 	return vertices.size();
 }
 
-int puni::Mesh::TriangleCount()
+unsigned int puni::Mesh::TriangleCount()
 {
 	return triangleCount;
 }
 
-int puni::Mesh::MeshType()
+unsigned int puni::Mesh::MeshType()
 {
 	return meshType;
 }
