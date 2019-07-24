@@ -98,13 +98,16 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0.5f, 0); //TL
-		//vertices[0].col = col::Blue();
+		vertices[0].col = glm::vec3(1.0f);
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0); //BL
+		vertices[1].col = glm::vec3(1.0f);
 		vertices[1].uv = glm::vec2(0, 0);
 		vertices[2].pos = glm::vec3(0.5f, 0.5f, 0); //TR
+		vertices[2].col = glm::vec3(1.0f);
 		vertices[2].uv = glm::vec2(1, 1);
 		vertices[3].pos = glm::vec3(0.5f, -0.5f, 0); //BR
+		vertices[3].col = glm::vec3(1.0f);
 		vertices[3].uv = glm::vec2(1, 0);
 
 		//setup the indices
@@ -124,13 +127,16 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0, -0.5f); //TL
-		//vertices[0].col = col::Blue();
+		vertices[0].col = glm::vec3(1.0f);
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, 0, 0.5f); //BL
+		vertices[1].col = glm::vec3(1.0f);
 		vertices[1].uv = glm::vec2(0, 0);
 		vertices[2].pos = glm::vec3(0.5f, 0, -0.5f); //TR
+		vertices[2].col = glm::vec3(1.0f);
 		vertices[2].uv = glm::vec2(1, 1);
 		vertices[3].pos = glm::vec3(0.5f, 0, 0.5f); //BR
+		vertices[3].col = glm::vec3(1.0f);
 		vertices[3].uv = glm::vec2(1, 0);
 
 		//setup the indices
@@ -150,11 +156,13 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[3];
 		//setup the positions
 		vertices[0].pos = glm::vec3(0, 0.5f, 0); //TM
-		//vertices[0].col = col::Blue();
+		vertices[0].col = glm::vec3(1.0f);
 		vertices[0].uv = glm::vec2(0.5f, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0); //BL
+		vertices[1].col = glm::vec3(1.0f);
 		vertices[1].uv = glm::vec2(0, 0);
 		vertices[2].pos = glm::vec3(0.5f, -0.5f, 0); //BR
+		vertices[2].col = glm::vec3(1.0f);
 		vertices[2].uv = glm::vec2(1, 0);
 
 		//setup the indices
@@ -277,13 +285,16 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0.5f, 0); //TL
-		//vertices[0].col = col::Blue();
+		vertices[0].col = glm::vec3(1.0f);
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, -0.5f, 0); //BL
+		vertices[1].col = glm::vec3(1.0f);
 		vertices[1].uv = glm::vec2(0, 0);
 		vertices[2].pos = glm::vec3(0.5f, 0.5f, 0); //TR
+		vertices[2].col = glm::vec3(1.0f);
 		vertices[2].uv = glm::vec2(1, 1);
 		vertices[3].pos = glm::vec3(0.5f, -0.5f, 0); //BR
+		vertices[3].col = glm::vec3(1.0f);
 		vertices[3].uv = glm::vec2(1, 0);
 
 		//setup the indices
@@ -306,13 +317,16 @@ namespace PrimitiveShapes
 		puni::Vertex vertices[4];
 		//setup the positions
 		vertices[0].pos = glm::vec3(-0.5f, 0, -0.5f); //TL
-		//vertices[0].col = col::Blue();
+		vertices[0].col = glm::vec3(1.0f);
 		vertices[0].uv = glm::vec2(0, 1);
 		vertices[1].pos = glm::vec3(-0.5f, 0, 0.5f); //BL
+		vertices[1].col = glm::vec3(1.0f);
 		vertices[1].uv = glm::vec2(0, 0);
 		vertices[2].pos = glm::vec3(0.5f, 0, -0.5f); //TR
+		vertices[2].col = glm::vec3(1.0f);
 		vertices[2].uv = glm::vec2(1, 1);
 		vertices[3].pos = glm::vec3(0.5f, 0, 0.5f); //BR
+		vertices[3].col = glm::vec3(1.0f);
 		vertices[3].uv = glm::vec2(1, 0);
 
 		//setup the indices

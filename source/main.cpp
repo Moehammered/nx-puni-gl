@@ -57,14 +57,20 @@ float movementSpeed = 5;
 float rotationSpeed = 360;
 std::string vertShaderPath = "romfs:/shaders/transform-coltex-shader.vs";
 std::string fragShaderPath = "romfs:/shaders/coltex-shader.fs";
-std::string texturePath = "romfs:/awesomeface.png";
+std::string faceTexturePath = "romfs:/awesomeface.png";
+std::string brickTexturePath = "romfs:/brick.jpg";
 puni::Shader colourShader;
 puni::Camera sceneCam;
 puni::Texture faceImg;
 puni::Material material;
+puni::ComponentUpdateQueue* cqueue;
+puni::RenderQueue* rqueue;
 
 puni::Object* obj;
 puni::GameObject testGO;
+puni::GameObject ground;
+puni::MeshRendererComponent* groundRend;
+
 ///extra experiment functions
 void updateTransform(GLuint& trLoc, glm::mat4 mat)
 {
@@ -163,7 +169,7 @@ static void sceneInit()
 
     tri = PrimitiveShapes::CreateTriangle();
 
-    faceImg.loadTexture(texturePath);
+    faceImg.loadTexture(faceTexturePath);
 
     vao = new puni::VertexArrayObject();
 
@@ -184,7 +190,7 @@ static void sceneInit()
 
 
     material.loadShader(vertShaderPath, fragShaderPath);
-    material.setTexture(new puni::Texture(texturePath));
+    material.setTexture(new puni::Texture(faceTexturePath));
     material.setAttributes(vertAttribs, 3);
     
     vao->setupBuffers(tri.VertexBufferProperty().data(), tri.VertexBufferProperty().size());
@@ -193,6 +199,9 @@ static void sceneInit()
     sceneCam.setAspectRatio(1280.0f,720.0f);
     sceneCam.setClippingPlanes(0.01f, 1000.0f);
     sceneCam.FieldOfView(45.0f);
+    sceneCam.transform.position = glm::vec3(0.0f,8.0f,15.0f);
+    sceneCam.transform.lookAt(glm::vec3(0,0,0));
+    sceneCam.updateView();
     shaderTransfromLoc = glGetUniformLocation(colourShader.ID(), "transform");
 
     triTr.position = glm::vec3(0,0,-3);
@@ -211,10 +220,21 @@ static void sceneInit()
     printf("initialising render component\n\n");
     mrend->initialise();
     mrend->material->loadShader(vertShaderPath, fragShaderPath);
+    mrend->material->setTexture(new puni::Texture(faceTexturePath));
     printf("updating material attrib in component\n\n");
     mrend->updateMaterialAttributes(vertAttribs, 3);
     printf("GO info:\n%s\n\n", testGO->toString().c_str());
-    testGO->transform.position = glm::vec3(0,-1, -4);
+    testGO->transform.position = glm::vec3(0.0f,1.0f, -4.0f);
+    testGO->transform.scale = glm::vec3(2.0f);
+
+    ground = puni::GameObject::Instantiate();
+    ground->transform.scale = glm::vec3(6.0f);
+    groundRend = ground->AddComponent<puni::MeshRendererComponent>();
+    groundRend->initialise();
+    groundRend->setMesh(PrimitiveShapes::CreateXZPlane());
+    groundRend->material->loadShader(vertShaderPath, fragShaderPath);
+    groundRend->material->setTexture(new puni::Texture(brickTexturePath));
+    groundRend->updateMaterialAttributes(vertAttribs, 3);
 
     glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -229,11 +249,14 @@ static void sceneRender()
 
     // colourShader.use();
     // faceImg.use();
-    material.use();
-    vao->bindVAO();
-    material.setTransformProperty("transform", sceneCam.ProjView() * triTr.TransformMat4());
-    // updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
-    glDrawElements(tri.MeshType(), tri.IndexCount(), GL_UNSIGNED_INT, 0);
+    // material.use();
+    // vao->bindVAO();
+    // material.setTransformProperty("transform", sceneCam.ProjView() * triTr.TransformMat4());
+    // // updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
+    // glDrawElements(tri.MeshType(), tri.IndexCount(), GL_UNSIGNED_INT, 0);
+
+    
+    rqueue->processRenderQueue();
 }
 
 static void sceneExit()
@@ -268,8 +291,8 @@ int main(int argc, char* argv[])
 
     puni::Input::Initialise();
     puni::Timer::Tick();
-    puni::ComponentUpdateQueue* cpqueue = puni::ComponentUpdateQueue::Instance();
-    puni::RenderQueue* rqueue = puni::RenderQueue::Instance();
+    cqueue = puni::ComponentUpdateQueue::Instance();
+    rqueue = puni::RenderQueue::Instance();
     // Main graphics loop    
     while (appletMainLoop())
     {
@@ -290,16 +313,16 @@ int main(int argc, char* argv[])
         }
 
         updateInput(triTr, puni::Timer::DeltaTime());
-        cpqueue->updateComponents();
+        cqueue->updateComponents();
         // Render stuff!
         sceneRender();
-        rqueue->processRenderQueue();
         eglSwapBuffers(glInstance->Display(), glInstance->Surface());
     }
 
     //cleanup obj
     puni::GameObject copyObj = testGO;
     puni::GameObject::Destroy(copyObj);
+    puni::GameObject::Destroy(ground);
     puni::ObjectAllocator::Instance()->addToDestroyQueue(obj);
     // Deinitialize our scene
     sceneExit();

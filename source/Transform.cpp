@@ -6,6 +6,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
+#include <glm/gtx/dual_quaternion.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include "glmhelpers.h"
 
@@ -13,7 +15,8 @@ puni::Transform::Transform()
 {
 	position = glm::vec3(0.0f);
 	scale = glm::vec3(1.0f);
-	Rotation(glm::quat(0,0,0,1.0f)); //portlib glm of quat doesn't auto-init to identity quat
+	 //portlib glm of quat doesn't auto-init to identity quat
+	Rotation(glm::quat(1.0f,0.0f,0.0f,0.0f));
 }
 
 
@@ -60,7 +63,7 @@ glm::vec3 puni::Transform::Right()
 void puni::Transform::Rotation(glm::quat value)
 {
 	rotation = value;
-	//working
+	//working --- TEST WHY UP IS DIFFERENTT!!!!!
 	rotationMat4 = glm::mat4_cast(rotation);
 	right = glm::vec3(rotationMat4[0][0], rotationMat4[0][1], rotationMat4[0][2]);
 	up = glm::vec3(rotationMat4[1][0], rotationMat4[1][1], rotationMat4[1][2]);
@@ -82,6 +85,8 @@ void puni::Transform::translate(glm::vec3 delta)
 void puni::Transform::rotate(glm::vec3 axis, float angle)
 {
 	glm::quat newRot = glm::angleAxis(glm::radians(angle), axis);
+	// std::cout << "Transform angle axis rot: " << newRot << std::endl;
+	printf("Transform angle axis rot:%s\n\n", glm::to_string(newRot).c_str());
 	Rotation(rotation * newRot);
 }
 

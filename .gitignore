@@ -3,6 +3,7 @@
 
 # extra things to ignore (imgs, data files for testing)
 *.png
+*.jpg
 build/*
 
 # Compiled Object files

@@ -9,6 +9,7 @@ puni::Material::Material()
 {
 	//shader = new Shader("transform-coltex-shader.vs", "coltex-shader.fs");
 	shader = 0;
+	texture = 0;
 	createDefaultAttributes();
 }
 
