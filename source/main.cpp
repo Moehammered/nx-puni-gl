@@ -24,6 +24,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "MeshRenderer.h"
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
@@ -41,7 +42,7 @@
 static int s_nxlinkSock = -1;
 
 unsigned int shaderTransfromLoc;
-puni::Transform triTr;
+puni::Transform objTransform;
 puni::Mesh tri;
 puni::VertexArrayObject *vao;
 float movementSpeed = 5;
@@ -51,6 +52,8 @@ std::string texturePath = "romfs:/awesomeface.png";
 puni::Shader colourShader;
 puni::Camera sceneCam;
 puni::Texture faceImg;
+puni::MeshRenderer* cubeRenderer;
+puni::Material cubeMaterial;
 
 ///extra experiment functions
 void updateTransform(GLuint& trLoc, glm::mat4 mat)
@@ -153,7 +156,6 @@ static void sceneInit()
     faceImg.loadTexture(texturePath);
 
     vao = new puni::VertexArrayObject();
-
     puni::VertexAttributes vertAttribs[] = {
         {
             0, 3, GL_FLOAT, GL_FALSE, 
@@ -176,24 +178,36 @@ static void sceneInit()
     sceneCam.setAspectRatio(1280.0f,720.0f);
     sceneCam.setClippingPlanes(0.01f, 1000.0f);
     sceneCam.FieldOfView(45.0f);
+    sceneCam.transform.position = glm::vec3(0,8,15);
+    sceneCam.transform.lookAt(glm::vec3(0));
+    sceneCam.updateView();
     shaderTransfromLoc = glGetUniformLocation(colourShader.ID(), "transform");
 
-    triTr.position = glm::vec3(0,0,-3);
-    triTr.scale = glm::vec3(1);
-    updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
+    objTransform.position = glm::vec3(0,0,-3);
+    objTransform.scale = glm::vec3(1);
+    updateTransform(shaderTransfromLoc, sceneCam.ProjView() * objTransform.TransformMat4());
 
-    printf("%s\n\n", triTr.toString().c_str());
+
+    cubeMaterial.loadShader(vertShaderPath, fragShaderPath);
+    cubeMaterial.setAttributes(vertAttribs, 3);
+    cubeMaterial.setTexture(new puni::Texture(texturePath));
+    cubeRenderer = new puni::MeshRenderer();
+    cubeRenderer->setMesh(PrimitiveShapes::CreateCube());
+    cubeRenderer->setMaterial(cubeMaterial);
+
+    printf("%s\n\n", objTransform.toString().c_str());
 }
 
 static void sceneRender()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    colourShader.use();
-    faceImg.use();
-    vao->bindVAO();
-    updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
+    // colourShader.use();
+    // faceImg.use();
+    // vao->bindVAO();
+    // updateTransform(shaderTransfromLoc, sceneCam.ProjView() * objTransform.TransformMat4());
+    cubeRenderer->draw(objTransform);
     glDrawElements(tri.MeshType(), tri.IndexCount(), GL_UNSIGNED_INT, 0);
 }
 
@@ -223,6 +237,9 @@ int main(int argc, char* argv[])
         printf("romfs Init Successful!\n");
     }
     
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
     // Initialize our scene
     sceneInit();
 
@@ -247,7 +264,7 @@ int main(int argc, char* argv[])
             printf("ElapsedTime: %f\n\n", puni::Timer::ElapsedTime());
         }
 
-        updateInput(triTr, puni::Timer::DeltaTime());
+        updateInput(objTransform, puni::Timer::DeltaTime());
 
         // Render stuff!
         sceneRender();
