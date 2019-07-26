@@ -6,25 +6,12 @@
 #include <EGL/egl.h>    // EGL library
 #include <EGL/eglext.h> // EGL extensions
 #include <glad/glad.h>  // glad library (OpenGL loader)
-// #define GLM_FORCE_PURE
-// #include <glm/vec3.hpp>
-// #include <glm/vec4.hpp>
-// #include <glm/mat4x4.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
 #include "OpenGLLoader.h"
 #include "Input.h"
 #include "Timer.h"
-#include "Transform.h"
-#include "PrimitiveShapes.h"
-#include "VertexArrayObject.h"
-#include "FileLoader.h"
-#include "Shader.h"
-#include "Camera.h"
-#include "Texture.h"
-#include "MeshRenderer.h"
+#include "FPSScene.h"
+
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
@@ -38,56 +25,37 @@
 #define TRACE(fmt,...) printf("%s: " fmt "\n", __PRETTY_FUNCTION__, ## __VA_ARGS__)
 
 
-// constexpr auto TAU = glm::two_pi<float>();
 static int s_nxlinkSock = -1;
 
-unsigned int shaderTransfromLoc;
-puni::Transform objTransform;
-puni::Mesh tri;
-puni::VertexArrayObject *vao;
-float movementSpeed = 5;
-std::string vertShaderPath = "romfs:/shaders/transform-coltex-shader.vs";
-std::string fragShaderPath = "romfs:/shaders/coltex-shader.fs";
-std::string texturePath = "romfs:/awesomeface.png";
-puni::Shader colourShader;
-puni::Camera sceneCam;
-puni::Texture faceImg;
-puni::MeshRenderer* cubeRenderer;
-puni::Material cubeMaterial;
+puni::FPSScene* fpsGame;
 
-///extra experiment functions
-void updateTransform(GLuint& trLoc, glm::mat4 mat)
-{
-    glUniformMatrix4fv(trLoc, 1, GL_FALSE, glm::value_ptr(mat));
-}
+// void updateInput(puni::Transform& tr, float deltaTime)
+// {
+//     if(puni::Input::IsKeyHeld(KEY_Y))
+//         tr.rotate(glm::vec3(0.0f,0.0f,1.0f), movementSpeed * deltaTime);
+//     if(puni::Input::IsKeyHeld(KEY_B))
+//         tr.rotate(glm::vec3(0,0,1), -movementSpeed * deltaTime);
 
-void updateInput(puni::Transform& tr, float deltaTime)
-{
-    if(puni::Input::IsKeyHeld(KEY_Y))
-        tr.rotate(glm::vec3(0.0f,0.0f,1.0f), movementSpeed * deltaTime);
-    if(puni::Input::IsKeyHeld(KEY_B))
-        tr.rotate(glm::vec3(0,0,1), -movementSpeed * deltaTime);
-
-    if(puni::Input::IsKeyPressed(KEY_X))
-        movementSpeed = movementSpeed + 0.5f < 10 ? movementSpeed+0.5f : movementSpeed;
-    else if(puni::Input::IsKeyPressed(KEY_B))
-        movementSpeed = movementSpeed - 0.5f > 1 ? movementSpeed-0.5f : movementSpeed;
+//     if(puni::Input::IsKeyPressed(KEY_X))
+//         movementSpeed = movementSpeed + 0.5f < 10 ? movementSpeed+0.5f : movementSpeed;
+//     else if(puni::Input::IsKeyPressed(KEY_B))
+//         movementSpeed = movementSpeed - 0.5f > 1 ? movementSpeed-0.5f : movementSpeed;
     
-    if(puni::Input::IsKeyHeld(KEY_UP))
-        tr.position += tr.Up() * movementSpeed * deltaTime;
-    else if(puni::Input::IsKeyHeld(KEY_DOWN))
-        tr.position -= tr.Up() * movementSpeed * deltaTime;
+//     if(puni::Input::IsKeyHeld(KEY_UP))
+//         tr.position += tr.Up() * movementSpeed * deltaTime;
+//     else if(puni::Input::IsKeyHeld(KEY_DOWN))
+//         tr.position -= tr.Up() * movementSpeed * deltaTime;
 
-    if(puni::Input::IsKeyHeld(KEY_RIGHT))
-        tr.position += tr.Right() * movementSpeed * deltaTime;
-    else if(puni::Input::IsKeyHeld(KEY_LEFT))
-        tr.position -= tr.Right() * movementSpeed * deltaTime;
+//     if(puni::Input::IsKeyHeld(KEY_RIGHT))
+//         tr.position += tr.Right() * movementSpeed * deltaTime;
+//     else if(puni::Input::IsKeyHeld(KEY_LEFT))
+//         tr.position -= tr.Right() * movementSpeed * deltaTime;
 
-    if(puni::Input::IsKeyHeld(KEY_ZL))
-        tr.position += tr.Forward() * movementSpeed * deltaTime;
-    else if(puni::Input::IsKeyHeld(KEY_ZR))
-        tr.position -= tr.Forward() * movementSpeed * deltaTime;
-}
+//     if(puni::Input::IsKeyHeld(KEY_ZL))
+//         tr.position += tr.Forward() * movementSpeed * deltaTime;
+//     else if(puni::Input::IsKeyHeld(KEY_ZR))
+//         tr.position -= tr.Forward() * movementSpeed * deltaTime;
+// }
 
 
 static void initNxLink()
@@ -146,56 +114,12 @@ static void setMesaConfig()
 
 static void sceneInit()
 {
-    std::string vss = puni::loadTextFile(vertShaderPath);
-    std::string fss = puni::loadTextFile(fragShaderPath);
-
-    colourShader.compile(vertShaderPath, fragShaderPath);
-
-    tri = PrimitiveShapes::CreateTriangle();
-
-    faceImg.loadTexture(texturePath);
-
-    vao = new puni::VertexArrayObject();
-    puni::VertexAttributes vertAttribs[] = {
-        {
-            0, 3, GL_FLOAT, GL_FALSE, 
-            sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::pos)
-        },
-        {
-            1, 3, GL_FLOAT, GL_FALSE, 
-            sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::col)
-        },
-        {
-            2, 2, GL_FLOAT, GL_FALSE, 
-            sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::uv)
-        }
-    };
-
-    
-    vao->setupBuffers(tri.VertexBufferProperty().data(), tri.VertexBufferProperty().size());
-    vao->setupAttributes(vertAttribs, 3);
-
-    sceneCam.setAspectRatio(1280.0f,720.0f);
-    sceneCam.setClippingPlanes(0.01f, 1000.0f);
-    sceneCam.FieldOfView(45.0f);
-    sceneCam.transform.position = glm::vec3(0,8,15);
-    sceneCam.transform.lookAt(glm::vec3(0));
-    sceneCam.updateView();
-    shaderTransfromLoc = glGetUniformLocation(colourShader.ID(), "transform");
-
-    objTransform.position = glm::vec3(0,0,-3);
-    objTransform.scale = glm::vec3(1);
-    updateTransform(shaderTransfromLoc, sceneCam.ProjView() * objTransform.TransformMat4());
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
 
-    cubeMaterial.loadShader(vertShaderPath, fragShaderPath);
-    cubeMaterial.setAttributes(vertAttribs, 3);
-    cubeMaterial.setTexture(new puni::Texture(texturePath));
-    cubeRenderer = new puni::MeshRenderer();
-    cubeRenderer->setMesh(PrimitiveShapes::CreateCube());
-    cubeRenderer->setMaterial(cubeMaterial);
-
-    printf("%s\n\n", objTransform.toString().c_str());
+    fpsGame = new puni::FPSScene();
+    fpsGame->initialise();
 }
 
 static void sceneRender()
@@ -203,16 +127,12 @@ static void sceneRender()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // colourShader.use();
-    // faceImg.use();
-    // vao->bindVAO();
-    // updateTransform(shaderTransfromLoc, sceneCam.ProjView() * objTransform.TransformMat4());
-    cubeRenderer->draw(objTransform);
-    glDrawElements(tri.MeshType(), tri.IndexCount(), GL_UNSIGNED_INT, 0);
+    fpsGame->draw();
 }
 
 static void sceneExit()
 {
+    delete fpsGame;
 }
 
 int main(int argc, char* argv[])
@@ -236,9 +156,6 @@ int main(int argc, char* argv[])
     {
         printf("romfs Init Successful!\n");
     }
-    
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 
     // Initialize our scene
     sceneInit();
@@ -255,27 +172,18 @@ int main(int argc, char* argv[])
         if(puni::Input::IsKeyReleased(KEY_PLUS))
             break;
 
-        if(puni::Input::IsKeyHeld(KEY_L | KEY_A))
-        {
-            printf("DeltaTime: %f\n\n", puni::Timer::DeltaTime());
-        }
-        else if(puni::Input::IsKeyPressed(KEY_R | KEY_A))
-        {
-            printf("ElapsedTime: %f\n\n", puni::Timer::ElapsedTime());
-        }
-
-        updateInput(objTransform, puni::Timer::DeltaTime());
-
         // Render stuff!
         sceneRender();
+
         eglSwapBuffers(glInstance->Display(), glInstance->Surface());
     }
 
     // Deinitialize our scene
     sceneExit();
-
+    printf("Scene destroyed.\n\n");
     // Deinitialize EGL
     glInstance->DestroySelf();
-    //deinitEgl();
+    printf("GL destroyed.\n\n");
+    
     return EXIT_SUCCESS;
 }
