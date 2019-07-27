@@ -26,6 +26,7 @@ namespace puni
         void setupCamera();
 
         float           movementSpeed, rotationSpeed;
+        double          stickDeadZone;
         Material        groundMaterial, playerMaterial;
         MeshRenderer    plRenderer, grRenderer;
         Transform       grTr, plTr;

@@ -2,10 +2,18 @@
 #include "PrimitiveShapes.h"
 #include <string>
 #include <stdio.h>
+#include <stdlib.h>
+#include "Input.h"
+#include "Timer.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm\gtx\norm.hpp>
 
 puni::FPSScene::FPSScene() { }
 
-puni::FPSScene::~FPSScene() { }
+puni::FPSScene::~FPSScene() 
+{ 
+    printf("FPSScene destructor called.\n\n");
+}
 
 void puni::FPSScene::cleanup()
 {
@@ -25,7 +33,7 @@ void puni::FPSScene::start()
 
 void puni::FPSScene::update()
 {
-
+    checkInput();
 }
 
 void puni::FPSScene::draw()
@@ -39,7 +47,7 @@ void puni::FPSScene::setupScene()
     //player vars
     movementSpeed = 10;
     rotationSpeed = 20;
-
+    stickDeadZone = 0.3;
     //material setup
     puni::VertexAttributes vertAttribs[] = {
         {
@@ -80,7 +88,27 @@ void puni::FPSScene::setupScene()
 
 void puni::FPSScene::checkInput()
 {
-
+    JoystickPosition lJoy = Input::ReadLeftStick();
+    bool move = false;
+    glm::vec3 moveDir = glm::vec3(0,0,0);
+    if(abs(lJoy.dx) > stickDeadZone)
+    {
+        move = true;
+        moveDir += plTr.Right() * (float)lJoy.dx;
+    }
+    if(abs(lJoy.dy) > stickDeadZone)
+    {
+        move = true;
+        moveDir += plTr.Forward() * (float)lJoy.dy;
+    }
+    if(move)
+    {
+        if(glm::length2(moveDir) > stickDeadZone*stickDeadZone)
+        {
+            moveDir = glm::normalize(moveDir);
+            plTr.position += moveDir * movementSpeed * Timer::DeltaTime();
+        }
+    }
 }
 
 void puni::FPSScene::setupCamera()

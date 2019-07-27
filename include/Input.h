@@ -1,6 +1,8 @@
 #ifndef SWITCH__INPUT__H_
 #define SWITCH__INPUT__H_
 
+#include <switch.h>
+
 namespace puni
 {
     class Input
@@ -11,6 +13,8 @@ namespace puni
             static bool IsKeyHeld(unsigned int key);
             static bool IsKeyPressed(unsigned int key);
             static bool IsKeyReleased(unsigned int key);
+            static JoystickPosition ReadLeftStick();
+            static JoystickPosition ReadRightStick();
 
         private:
             Input();

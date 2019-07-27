@@ -52,7 +52,7 @@ void puni::VertexArrayObject::setupBuffers(const BufferProperty * const properti
 		glBindBuffer(prop.bufferTarget, bufferID);
 		glBufferData(prop.bufferTarget, prop.bufferSize, prop.data, prop.usage);
 		glBindBuffer(prop.bufferTarget, 0);
-		printBufferProperty(prop);
+		//printBufferProperty(prop);
 	}
 	//need to do this to correct it from unbinding from the VAO...
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); 
@@ -75,7 +75,7 @@ void puni::VertexArrayObject::setupAttributes(const VertexAttributes * const att
 		VertexAttributes att = attributes[i];
 		glVertexAttribPointer(att.position, att.componentCount, att.type, 
 			att.normalised, att.stride, att.componentOffset);
-		printVertexAttribute(att);
+		//printVertexAttribute(att);
 		glEnableVertexAttribArray(att.position);
 	}
 

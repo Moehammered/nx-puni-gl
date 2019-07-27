@@ -3,12 +3,7 @@
 
 puni::Scene::Scene() { }
 
-void puni::Scene::cleanup() 
-{ 
-    printf("Cleaning up base Scene.\n\n");
-}
-
 puni::Scene::~Scene()
 {
-    cleanup();
+    printf("Base scene destructor called.\n\n");
 }

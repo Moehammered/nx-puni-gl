@@ -132,6 +132,7 @@ static void sceneRender()
 
 static void sceneExit()
 {
+    fpsGame->cleanup();
     delete fpsGame;
 }
 
@@ -171,6 +172,8 @@ int main(int argc, char* argv[])
 
         if(puni::Input::IsKeyReleased(KEY_PLUS))
             break;
+
+        fpsGame->update();
 
         // Render stuff!
         sceneRender();

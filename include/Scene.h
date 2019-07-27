@@ -15,8 +15,8 @@ namespace puni
         virtual void start()=0;
         virtual void update()=0;
         virtual void draw()=0;
+        virtual void cleanup()=0;
     protected:
-        virtual void cleanup();
 
         Camera sceneCam;
     };

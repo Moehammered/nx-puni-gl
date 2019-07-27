@@ -1,7 +1,5 @@
 #include "Input.h"
 #include <stdio.h>
-//#include <switch\services\hid.h>
-#include <switch.h>
 
 puni::Input* puni::Input::_instance = nullptr;
 
@@ -38,6 +36,20 @@ bool puni::Input::IsKeyPressed(unsigned int key)
 bool puni::Input::IsKeyReleased(unsigned int key)
 {
     return key & hidKeysUp(CONTROLLER_P1_AUTO);
+}
+
+JoystickPosition puni::Input::ReadLeftStick()
+{
+    JoystickPosition stick;
+    hidJoystickRead(&stick, CONTROLLER_P1_AUTO, JOYSTICK_LEFT);
+    return stick;
+}
+
+JoystickPosition puni::Input::ReadRightStick()
+{
+    JoystickPosition stick;
+    hidJoystickRead(&stick, CONTROLLER_P1_AUTO, JOYSTICK_RIGHT);
+    return stick;
 }
 
 puni::Input::Input() {printf("Creating Input Instance.\n\n");}

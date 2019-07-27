@@ -18,7 +18,11 @@ puni::Texture::Texture(std::string path)
 
 puni::Texture::~Texture()
 {
-	glDeleteTextures(1, &textureID);
+	printf("Destroying Texture.\n\n");
+	printf("Deleting gl texture ID.\n\n");
+	if(textureID)
+		glDeleteTextures(1, &textureID);
+	printf("Destroyed Texture.\n\n");
 }
 
 const int puni::Texture::Width()
