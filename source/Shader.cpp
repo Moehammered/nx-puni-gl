@@ -34,11 +34,11 @@ puni::Shader::Shader()
 
 puni::Shader::~Shader()
 {
-	printf("Destroying Shader.\n\n");
-	printf("Deleting gl shader ID.\n\n");
+	// printf("Destroying Shader.\n\n");
+	// printf("Deleting gl shader ID.\n\n");
 	if(shaderID)
 		glDeleteProgram(shaderID);
-	printf("Destroyed Shader.\n\n");		
+	// printf("Destroyed Shader.\n\n");		
 }
 
 unsigned int puni::Shader::ID()

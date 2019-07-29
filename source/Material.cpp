@@ -30,12 +30,12 @@ puni::Material::Material(Shader * const preMadeShader)
 
 puni::Material::~Material()
 {
-	printf("Destroying Material.\n\n");
-	printf("Deleting Shader in Material.\n\n");
+	// printf("Destroying Material.\n\n");
+	// printf("Deleting Shader in Material.\n\n");
 	delete shader;
-	printf("Deleting Texture in Material.\n\n");
+	// printf("Deleting Texture in Material.\n\n");
 	delete texture;
-	printf("Destroyed Material.\n\n");
+	// printf("Destroyed Material.\n\n");
 }
 
 unsigned int puni::Material::shaderID()

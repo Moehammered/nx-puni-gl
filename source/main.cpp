@@ -183,10 +183,8 @@ int main(int argc, char* argv[])
 
     // Deinitialize our scene
     sceneExit();
-    printf("Scene destroyed.\n\n");
     // Deinitialize EGL
     glInstance->DestroySelf();
-    printf("GL destroyed.\n\n");
     
     return EXIT_SUCCESS;
 }

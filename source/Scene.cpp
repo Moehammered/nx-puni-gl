@@ -5,5 +5,4 @@ puni::Scene::Scene() { }
 
 puni::Scene::~Scene()
 {
-    printf("Base scene destructor called.\n\n");
 }

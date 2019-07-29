@@ -25,7 +25,7 @@ puni::Mesh::Mesh(const Mesh & mesh)
 	this->triangleCount = mesh.triangleCount;
 	setVertices(mesh.vertices.data(), mesh.vertices.size());
 	setIndices(mesh.indices.data(), mesh.indices.size());
-	printf("Mesh copy constructor called.\n\n");
+	// printf("Mesh copy constructor called.\n\n");
 }
 
 void puni::Mesh::operator=(const Mesh& mesh)
@@ -35,7 +35,7 @@ void puni::Mesh::operator=(const Mesh& mesh)
 	this->triangleCount = mesh.triangleCount;
 	setVertices(mesh.vertices.data(), mesh.vertices.size());
 	setIndices(mesh.indices.data(), mesh.indices.size());
-	printf("Mesh assignment operator called.\n\n");
+	// printf("Mesh assignment operator called.\n\n");
 }
 
 puni::Mesh::~Mesh()

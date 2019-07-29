@@ -46,7 +46,7 @@ void puni::FPSScene::setupScene()
 {
     //player vars
     movementSpeed = 10;
-    rotationSpeed = 20;
+    rotationSpeed = 120;
     stickDeadZone = 0.3;
     //material setup
     puni::VertexAttributes vertAttribs[] = {
@@ -107,6 +107,17 @@ void puni::FPSScene::checkInput()
         {
             moveDir = glm::normalize(moveDir);
             plTr.position += moveDir * movementSpeed * Timer::DeltaTime();
+        }
+    }
+    // move = false;
+    JoystickPosition rJoy = Input::ReadRightStick();
+    glm::vec3 angle = glm::vec3(rJoy.dy,-rJoy.dx,0.0f);
+    if(abs(rJoy.dx) > stickDeadZone)
+    {
+        if(glm::length2(angle) > stickDeadZone*stickDeadZone)
+        {
+            angle = glm::normalize(angle);
+            plTr.rotate(angle, rotationSpeed * Timer::DeltaTime());
         }
     }
 }

@@ -9,7 +9,7 @@ puni::MeshRenderer::MeshRenderer()
 
 puni::MeshRenderer::~MeshRenderer()
 {
-	printf("Destroying MeshRenderer.\n\n");
+	//printf("Destroying MeshRenderer.\n\n");
 }
 
 const puni::Mesh & puni::MeshRenderer::getMesh()
