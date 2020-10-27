@@ -1,7 +1,7 @@
 #ifndef SWITCH__VAO__H_
 #define SWITCH__VAO__H_
 
-#include <glad\glad.h>
+#include <glad/glad.h>
 #include <vector>
 
 namespace puni

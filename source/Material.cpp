@@ -1,26 +1,28 @@
 #include "Material.h"
 
-#include <glad\glad.h>
-#include <glm\gtc\type_ptr.hpp>
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include "Vertex.h"
-#include <stdio.h>
 
 puni::Material::Material()
 {
 	//shader = new Shader("transform-coltex-shader.vs", "coltex-shader.fs");
-	shader = 0;
-	texture = 0;
+    texture = 0;
+    shader = 0;
 	createDefaultAttributes();
 }
 
 puni::Material::Material(std::string vertexShaderPath, std::string fragmentShaderPath)
 {
+    texture = 0;
+    shader = 0;
 	loadShader(vertexShaderPath, fragmentShaderPath);
 	createDefaultAttributes();
 }
 
 puni::Material::Material(Shader * const preMadeShader)
 {
+    texture = 0;
 	shader = preMadeShader;
 	createDefaultAttributes();
 }
@@ -28,8 +30,14 @@ puni::Material::Material(Shader * const preMadeShader)
 
 puni::Material::~Material()
 {
-	delete shader;
-	delete texture;
+	// printf("Destroying Material.\n\n");
+	// printf("Deleting Shader in Material.\n\n");
+	if(shader != nullptr)
+		delete shader;
+	// printf("Deleting Texture in Material.\n\n");
+	if(texture != nullptr)
+		delete texture;
+	// printf("Destroyed Material.\n\n");
 }
 
 unsigned int puni::Material::shaderID()
@@ -41,13 +49,10 @@ void puni::Material::loadShader(std::string vertP, std::string fragP)
 {
 	if(shader)
 	{
-		printf("deleting material shader...\n\n");
 		delete shader;
 		shader = 0;
 	}
-	printf("making material shader...\n\n");
 	shader = new Shader();
-	printf("compiling material shader...\n\n");
 	shader->compile(vertP, fragP);
 }
 

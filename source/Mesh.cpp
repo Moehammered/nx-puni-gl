@@ -1,7 +1,9 @@
 #include "Mesh.h"
 
-#include <glad\glad.h>
+#include <glad/glad.h>
 #include <stdio.h>
+#include <iostream>
+#include "tiny_obj_loader.h"
 
 puni::Mesh::Mesh()
 {
@@ -9,10 +11,10 @@ puni::Mesh::Mesh()
 	meshType = GL_TRIANGLES;
 	BufferProperty bf[] = {
 			{
-				GL_ARRAY_BUFFER, GLsizeiptr(sizeof(Vertex) * VertexCount()), Vertices(), GL_STATIC_DRAW
+				GL_ARRAY_BUFFER, (GLsizeiptr)(sizeof(Vertex) * VertexCount()), Vertices(), GL_STATIC_DRAW
 			},
 			{
-				GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(sizeof(GLuint) * IndexCount()), Indices(), GL_STATIC_DRAW
+				GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)(sizeof(GLuint) * IndexCount()), Indices(), GL_STATIC_DRAW
 			}
 	};
 	buffers.insert(buffers.begin(), bf, bf + 2);
@@ -25,7 +27,7 @@ puni::Mesh::Mesh(const Mesh & mesh)
 	this->triangleCount = mesh.triangleCount;
 	setVertices(mesh.vertices.data(), mesh.vertices.size());
 	setIndices(mesh.indices.data(), mesh.indices.size());
-	printf("Mesh copy constructor called.\n\n");
+	// printf("Mesh copy constructor called.\n\n");
 }
 
 void puni::Mesh::operator=(const Mesh& mesh)
@@ -35,7 +37,7 @@ void puni::Mesh::operator=(const Mesh& mesh)
 	this->triangleCount = mesh.triangleCount;
 	setVertices(mesh.vertices.data(), mesh.vertices.size());
 	setIndices(mesh.indices.data(), mesh.indices.size());
-	printf("Mesh assignment operator called.\n\n");
+	// printf("Mesh assignment operator called.\n\n");
 }
 
 puni::Mesh::~Mesh()
@@ -104,7 +106,7 @@ unsigned int puni::Mesh::TriangleCount()
 	return triangleCount;
 }
 
-int puni::Mesh::MeshType()
+unsigned int puni::Mesh::MeshType()
 {
 	return meshType;
 }
@@ -160,4 +162,76 @@ void puni::Mesh::updateBufferProperties()
 
 	//clear the flags
 	updateFlag = 0x0;
+}
+
+
+puni::Mesh puni::Mesh::LoadFromOBJ(std::string file)
+{
+	Mesh model;
+	model.useTriangleList();
+
+	using namespace std;
+
+	vector<tinyobj::shape_t> shapes;
+	vector<tinyobj::material_t> materials;
+	string warn;
+	string err;
+	tinyobj::attrib_t attr;
+
+	bool result = tinyobj::LoadObj(&attr, &shapes, &materials, &warn, &err, file.c_str());
+
+	if (!warn.empty()) {
+	cout << warn << endl;
+	}
+
+	if (!err.empty()) {
+	cerr << err << endl;
+	}
+
+	if (!result) {
+	cout << "Load failed for file " << file << endl;
+	}
+
+	vector<Vertex> modelVerts;
+	modelVerts.reserve(attr.vertices.size()/3);
+	// for(auto i = 0, texCoord = 0; i < attr.vertices.size(); i += 3, texCoord += 2)
+	// {
+	// 	Vertex vert;
+	// 	vert.pos.x = attr.vertices[i];
+	// 	vert.pos.y = attr.vertices[i+1];
+	// 	vert.pos.z = attr.vertices[i+2];
+	// 	vert.uv.x = attr.texcoords[texCoord];
+	// 	vert.uv.y = attr.texcoords[texCoord+1];
+	// 	vert.col = glm::vec3(0.5f);
+
+	// 	modelVerts.push_back(vert);
+	// }
+
+	vector<int> modelIndices;
+
+	for(auto shape : shapes)
+	{
+		for(auto i = 0; i < shape.mesh.indices.size(); ++i)
+		{
+			auto index = shape.mesh.indices[i];
+			modelIndices.push_back(3*index.vertex_index);
+			modelIndices.push_back(3*index.vertex_index+1);
+			modelIndices.push_back(3*index.vertex_index+2);
+			Vertex vert;
+
+			vert.pos.x = attr.vertices[3*index.vertex_index];
+			vert.pos.y = attr.vertices[3*index.vertex_index+1];
+			vert.pos.z = attr.vertices[3*index.vertex_index+2];
+			vert.uv.x = attr.texcoords[2*index.texcoord_index];
+			vert.uv.y = attr.texcoords[2*index.texcoord_index+1];
+			vert.col = glm::vec3(0.5f);
+
+			modelVerts.push_back(vert);
+		}
+	}
+
+	model.setIndices(modelIndices.data(), modelIndices.size());
+	model.setVertices(modelVerts.data(), modelVerts.size());
+
+	return model;
 }

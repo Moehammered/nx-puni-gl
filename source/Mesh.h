@@ -3,6 +3,7 @@
 
 #include "Vertex.h"
 #include <vector>
+#include <string>
 #include "VertexArrayObject.h"
 
 namespace puni
@@ -23,11 +24,13 @@ namespace puni
 			unsigned int IndexCount();
 			unsigned int VertexCount();
 			unsigned int TriangleCount();
-			int MeshType();
+			unsigned int MeshType();
 			const std::vector<BufferProperty> VertexBufferProperty() const;
 
 			const Vertex* const Vertices();
 			const int* const Indices();
+
+			static Mesh LoadFromOBJ(std::string file);
 
 			void operator =(const Mesh& mesh);
 
@@ -35,7 +38,7 @@ namespace puni
 			std::vector<int> indices;
 			std::vector<Vertex> vertices;
 			std::vector<BufferProperty> buffers;
-			int triangleCount, meshType;
+			unsigned int triangleCount, meshType;
 
 			void updateBufferProperties();
 

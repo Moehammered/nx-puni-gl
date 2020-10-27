@@ -1,9 +1,6 @@
 #include "Camera.h"
 
-#include <glm\gtc\matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm\gtx\string_cast.hpp>
-#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
 
 puni::Camera* puni::Camera::MainCamera = nullptr;
 

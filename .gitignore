@@ -2,6 +2,7 @@
 *.d
 
 # extra things to ignore (imgs, data files for testing)
+*.jpg
 *.png
 *.jpg
 build/*

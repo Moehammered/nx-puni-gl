@@ -12,7 +12,6 @@ namespace puni
 
         private:
             Timer();
-            ~Timer();
 
             static Timer& Instance();
             // static Timer* _instance;

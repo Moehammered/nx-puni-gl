@@ -1,8 +1,8 @@
 #ifndef SWITCH__TRANSFORM__H_
 #define SWITCH__TRANSFORM__H_
 
-#include <glm\glm.hpp>
-#include <glm\gtc\quaternion.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <string>
 
 namespace puni

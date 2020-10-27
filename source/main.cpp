@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <iomanip>
+#ifdef __SWITCH__
 #include <switch.h>
-
-#include <EGL/egl.h>    // EGL library
-#include <EGL/eglext.h> // EGL extensions
-#include <glad/glad.h>  // glad library (OpenGL loader)
-// #define GLM_FORCE_PURE
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+// #include <EGL/egl.h>    // EGL library
+// #include <EGL/eglext.h> // EGL extensions
+#endif
+// #include <glad/glad.h>  // glad library (OpenGL loader)
 #include "stb_image.h"
 
 /// my stuff
@@ -17,26 +16,11 @@
 #include "OpenGLLoader.h"
 #include "Input.h"
 #include "Timer.h"
-#include "Transform.h"
-#include "PrimitiveShapes.h"
-#include "VertexArrayObject.h"
-#include "FileLoader.h"
-#include "Shader.h"
-#include "Camera.h"
-#include "Texture.h"
-#include "ObjectAllocator.h"
-#include "GameObject.h"
-#include "UpdateableComponent.h"
-#include "ComponentUpdateQueue.h"
-#include "RenderQueue.h"
-#include "Material.h"
-#include "FPSMovementComponent.h"
-#include "MeshRendererComponent.h"
-
+#include "FPSScene.h"
+#include <thread>
 //-----------------------------------------------------------------------------
 // nxlink support
 //-----------------------------------------------------------------------------
-
 #define ENABLE_NXLINK
 
 #ifndef ENABLE_NXLINK
@@ -45,67 +29,41 @@
 #include <unistd.h>
 #define TRACE(fmt,...) printf("%s: " fmt "\n", __PRETTY_FUNCTION__, ## __VA_ARGS__)
 
-
-// constexpr auto TAU = glm::two_pi<float>();
+#ifdef __SWITCH__
 static int s_nxlinkSock = -1;
+#endif
 
-unsigned int shaderTransfromLoc;
-puni::Transform triTr;
-puni::Mesh tri;
-puni::VertexArrayObject *vao;
-float movementSpeed = 5;
-float rotationSpeed = 360;
-std::string vertShaderPath = "romfs:/shaders/transform-coltex-shader.vs";
-std::string fragShaderPath = "romfs:/shaders/coltex-shader.fs";
-std::string faceTexturePath = "romfs:/awesomeface.png";
-std::string brickTexturePath = "romfs:/brick.jpg";
-puni::Shader colourShader;
-puni::Camera sceneCam;
-puni::Texture faceImg;
-puni::Material material;
-puni::ComponentUpdateQueue* cqueue;
-puni::RenderQueue* rqueue;
+puni::FPSScene* fpsGame;
 
-puni::Object* obj;
-puni::GameObject testGO;
-puni::GameObject ground;
-puni::MeshRendererComponent* groundRend;
+// void updateInput(puni::Transform& tr, float deltaTime)
+// {
+//     if(puni::Input::IsKeyHeld(KEY_Y))
+//         tr.rotate(glm::vec3(0.0f,0.0f,1.0f), movementSpeed * deltaTime);
+//     if(puni::Input::IsKeyHeld(KEY_B))
+//         tr.rotate(glm::vec3(0,0,1), -movementSpeed * deltaTime);
 
-///extra experiment functions
-void updateTransform(GLuint& trLoc, glm::mat4 mat)
-{
-    glUniformMatrix4fv(trLoc, 1, GL_FALSE, glm::value_ptr(mat));
-}
-
-void updateInput(puni::Transform& tr, float deltaTime)
-{
-    if(puni::Input::IsKeyHeld(KEY_Y))
-        tr.rotate(glm::vec3(0.0f,0.0f,1.0f), rotationSpeed * deltaTime);
-    if(puni::Input::IsKeyHeld(KEY_B))
-        tr.rotate(glm::vec3(0,0,1), -rotationSpeed * deltaTime);
-
-    if(puni::Input::IsKeyPressed(KEY_X))
-        movementSpeed = movementSpeed + 0.5f < 10 ? movementSpeed+0.5f : movementSpeed;
-    else if(puni::Input::IsKeyPressed(KEY_B))
-        movementSpeed = movementSpeed - 0.5f > 1 ? movementSpeed-0.5f : movementSpeed;
+//     if(puni::Input::IsKeyPressed(KEY_X))
+//         movementSpeed = movementSpeed + 0.5f < 10 ? movementSpeed+0.5f : movementSpeed;
+//     else if(puni::Input::IsKeyPressed(KEY_B))
+//         movementSpeed = movementSpeed - 0.5f > 1 ? movementSpeed-0.5f : movementSpeed;
     
-    if(puni::Input::IsKeyHeld(KEY_UP))
-        tr.position += tr.Up() * movementSpeed * deltaTime;
-    else if(puni::Input::IsKeyHeld(KEY_DOWN))
-        tr.position -= tr.Up() * movementSpeed * deltaTime;
+//     if(puni::Input::IsKeyHeld(KEY_UP))
+//         tr.position += tr.Up() * movementSpeed * deltaTime;
+//     else if(puni::Input::IsKeyHeld(KEY_DOWN))
+//         tr.position -= tr.Up() * movementSpeed * deltaTime;
 
-    if(puni::Input::IsKeyHeld(KEY_RIGHT))
-        tr.position += tr.Right() * movementSpeed * deltaTime;
-    else if(puni::Input::IsKeyHeld(KEY_LEFT))
-        tr.position -= tr.Right() * movementSpeed * deltaTime;
+//     if(puni::Input::IsKeyHeld(KEY_RIGHT))
+//         tr.position += tr.Right() * movementSpeed * deltaTime;
+//     else if(puni::Input::IsKeyHeld(KEY_LEFT))
+//         tr.position -= tr.Right() * movementSpeed * deltaTime;
 
-    if(puni::Input::IsKeyHeld(KEY_ZL))
-        tr.position += tr.Forward() * movementSpeed * deltaTime;
-    else if(puni::Input::IsKeyHeld(KEY_ZR))
-        tr.position -= tr.Forward() * movementSpeed * deltaTime;
-}
+//     if(puni::Input::IsKeyHeld(KEY_ZL))
+//         tr.position += tr.Forward() * movementSpeed * deltaTime;
+//     else if(puni::Input::IsKeyHeld(KEY_ZR))
+//         tr.position -= tr.Forward() * movementSpeed * deltaTime;
+// }
 
-
+#ifdef __SWITCH__
 static void initNxLink()
 {
     if (R_FAILED(socketInitializeDefault()))
@@ -137,13 +95,13 @@ extern "C" void userAppExit()
 {
     deinitNxLink();
 }
-
+#endif
 #endif
 
 //-----------------------------------------------------------------------------
 // Main program
 //-----------------------------------------------------------------------------
-
+#ifdef __SWITCH__
 static void setMesaConfig()
 {
     // Uncomment below to disable error checking and save CPU time (useful for production):
@@ -159,87 +117,16 @@ static void setMesaConfig()
     //setenv("NV50_PROG_DEBUG", "1", 1);
     //setenv("NV50_PROG_CHIPSET", "0x120", 1);
 }
+#endif
 
 static void sceneInit()
 {
-    std::string vss = puni::loadTextFile(vertShaderPath);
-    std::string fss = puni::loadTextFile(fragShaderPath);
-
-    colourShader.compile(vertShaderPath, fragShaderPath);
-
-    tri = PrimitiveShapes::CreateTriangle();
-
-    faceImg.loadTexture(faceTexturePath);
-
-    vao = new puni::VertexArrayObject();
-
-    puni::VertexAttributes vertAttribs[] = {
-        {
-            0, 3, GL_FLOAT, GL_FALSE, 
-            sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::pos)
-        },
-        {
-            1, 3, GL_FLOAT, GL_FALSE, 
-            sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::col)
-        },
-        {
-            2, 2, GL_FLOAT, GL_FALSE, 
-            sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::uv)
-        }
-    };
-
-
-    material.loadShader(vertShaderPath, fragShaderPath);
-    material.setTexture(new puni::Texture(faceTexturePath));
-    material.setAttributes(vertAttribs, 3);
-    
-    vao->setupBuffers(tri.VertexBufferProperty().data(), tri.VertexBufferProperty().size());
-    vao->setupAttributes(material.MaterialAttributes().data(), material.MaterialAttributes().size());
-
-    sceneCam.setAspectRatio(1280.0f,720.0f);
-    sceneCam.setClippingPlanes(0.01f, 1000.0f);
-    sceneCam.FieldOfView(45.0f);
-    sceneCam.transform.position = glm::vec3(0.0f,8.0f,15.0f);
-    sceneCam.transform.lookAt(glm::vec3(0,0,0));
-    sceneCam.updateView();
-    shaderTransfromLoc = glGetUniformLocation(colourShader.ID(), "transform");
-
-    triTr.position = glm::vec3(0,0,-3);
-    triTr.scale = glm::vec3(1);
-    updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
-
-    obj = &puni::Object::Instantiate<puni::Object>();
-    testGO = puni::GameObject::Instantiate();
-    testGO->name = "I'm alive!!!";
-    printf("Adding fps component\n\n");
-    puni::FPSMovementComponent* fpsC = testGO->AddComponent<puni::FPSMovementComponent>();
-    fpsC->initialise();
-    fpsC->movementSpeed = 10;
-    printf("Adding render component\n\n");
-    puni::MeshRendererComponent* mrend = testGO->AddComponent<puni::MeshRendererComponent>();
-    printf("initialising render component\n\n");
-    mrend->initialise();
-    mrend->material->loadShader(vertShaderPath, fragShaderPath);
-    mrend->material->setTexture(new puni::Texture(faceTexturePath));
-    printf("updating material attrib in component\n\n");
-    mrend->updateMaterialAttributes(vertAttribs, 3);
-    printf("GO info:\n%s\n\n", testGO->toString().c_str());
-    testGO->transform.position = glm::vec3(0.0f,1.0f, -4.0f);
-    testGO->transform.scale = glm::vec3(2.0f);
-
-    ground = puni::GameObject::Instantiate();
-    ground->transform.scale = glm::vec3(6.0f);
-    groundRend = ground->AddComponent<puni::MeshRendererComponent>();
-    groundRend->initialise();
-    groundRend->setMesh(PrimitiveShapes::CreateXZPlane());
-    groundRend->material->loadShader(vertShaderPath, fragShaderPath);
-    groundRend->material->setTexture(new puni::Texture(brickTexturePath));
-    groundRend->updateMaterialAttributes(vertAttribs, 3);
-
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-    glFrontFace(GL_CCW);
-    glCullFace(GL_BACK);
+
+
+    fpsGame = new puni::FPSScene();
+    fpsGame->initialise();
 }
 
 static void sceneRender()
@@ -247,91 +134,156 @@ static void sceneRender()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // colourShader.use();
-    // faceImg.use();
-    // material.use();
-    // vao->bindVAO();
-    // material.setTransformProperty("transform", sceneCam.ProjView() * triTr.TransformMat4());
-    // // updateTransform(shaderTransfromLoc, sceneCam.ProjView() * triTr.TransformMat4());
-    // glDrawElements(tri.MeshType(), tri.IndexCount(), GL_UNSIGNED_INT, 0);
-
-    
-    rqueue->processRenderQueue();
+    fpsGame->draw();
 }
 
 static void sceneExit()
 {
-    puni::ObjectAllocator::Instance()->processDestroyQueue();
+    fpsGame->cleanup();
+    delete fpsGame;
+}
+
+void TestBitShifting()
+{
+    using namespace std;
+
+    unsigned int val1 = UINT_MAX;
+    unsigned int val2 = val1 / 7;
+
+    cout << setbase(16);
+
+    cout << "UINT HEX: " << val1 << ", " << val2 << endl;
+
+    cout << "Expected: " << val1 << val2 << endl;
+    unsigned long long valPair1 = val1;
+    valPair1 = valPair1 << 32;
+    valPair1 = valPair1 | val2;
+    cout << "LONG LONG PAIRED: " << valPair1 << endl;
+
+    unsigned short short1 = UINT16_MAX;
+    unsigned short short2 = short1 / 3;
+    cout << "SHORT HEX: " << short1 << ", " << short2 << endl;
+
+    cout << "Expected: " << short1 << short2 << endl;
+    unsigned int valPair2 = short1;
+    valPair2 = valPair2 << 16;
+    valPair2 = valPair2 | short2;
+    cout << "INT PAIRED: " << valPair2 << endl;
+
+    cout << setbase(10);
 }
 
 int main(int argc, char* argv[])
 {
     // Set mesa configuration (useful for debugging)
+#ifdef __SWITCH__
     setMesaConfig();
-    stbi_set_flip_vertically_on_load(true);
-    // Initialize EGL on the default window
-    // Load OpenGL routines using glad
-    puni::OpenGLLoader* glInstance = puni::OpenGLLoader::Instance();
-    if(!glInstance->initialiseOpenGL())
-        return EXIT_FAILURE;
-    else
-        printf("Initialised GL successfully!\n\n");
-
-    
     Result rc = romfsInit();
     if (R_FAILED(rc))
         printf("romfsInit: %08X\n", rc);
     else
-    {
         printf("romfs Init Successful!\n");
+#endif
+    // Initialize EGL on the default window
+    // Load OpenGL routines using glad
+    puni::OpenGLLoader& glInstance = puni::OpenGLLoader::Instance();
+    if(!glInstance.initialiseOpenGL())
+    {
+        std::cout << "Initialised GL FAILED!\n" << std::endl;
+        return EXIT_FAILURE;
     }
-    
+    else
+        std::cout << "Initialised GL successfully!\n" << std::endl;
+
     // Initialize our scene
     sceneInit();
 
+    TestBitShifting();
+
     puni::Input::Initialise();
+    glfwSetKeyCallback(glInstance.getWindow(), puni::Input::StoreKeyState);
+    glfwSetInputMode(glInstance.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     puni::Timer::Tick();
-    cqueue = puni::ComponentUpdateQueue::Instance();
-    rqueue = puni::RenderQueue::Instance();
-    // Main graphics loop    
-    while (appletMainLoop())
+
+    //crude 'frame limiter'
+    double desiredFrameTime = 1/60.0;
+
+    const int timePoints = 240;
+    double times[timePoints];
+    double sleepTimes[timePoints];
+    int timeIndex = 0;
+    int sleepIndex = 0;
+
+    while (!glfwWindowShouldClose(glInstance.getWindow()))
     {
         // Get and process input
-        puni::Input::RecordState();
         puni::Timer::Tick();
 
-        if(puni::Input::IsKeyReleased(KEY_PLUS))
-            break;
+        glfwPollEvents();
+        puni::Input::RecordMouseMovement();
+        puni::Input::RecordGamepads();
+        if(puni::Input::IsKeyReleased(GLFW_KEY_ESCAPE) || puni::Input::IsButtonReleased(GLFW_GAMEPAD_BUTTON_START))
+            glfwSetWindowShouldClose(glInstance.getWindow(), true);
+        
+        fpsGame->update();
 
-        if(puni::Input::IsKeyHeld(KEY_L | KEY_A))
-        {
-            printf("DeltaTime: %f\n\n", puni::Timer::DeltaTime());
-        }
-        else if(puni::Input::IsKeyPressed(KEY_R | KEY_A))
-        {
-            printf("ElapsedTime: %f\n\n", puni::Timer::ElapsedTime());
-        }
-
-        updateInput(triTr, puni::Timer::DeltaTime());
-        cqueue->updateComponents();
         // Render stuff!
         sceneRender();
-        eglSwapBuffers(glInstance->Display(), glInstance->Surface());
+        glfwSwapBuffers(glInstance.getWindow());
+        puni::Input::RecordKeys();
+
+        times[timeIndex++] = puni::Timer::DeltaTime();
+        if(timeIndex >= timePoints)
+        {
+            std::cout << "Average FPS over " << timePoints << " frames: ";
+            auto total = 0.0;
+            for(auto i = 0; i < timePoints; ++i)
+                total += times[i];
+
+            std::cout << timePoints/total << " frames / sec" << std::endl;
+            timeIndex = 0;
+        }
+
+        /// TEMPORARY SOLUTION -- The program runs as fast as possible, hogging resources and increasing power usage
+        /// Sleeping for the remainder of the excess frame is temporary
+        /// Later on implement a frame limiter
+        auto delta = puni::Timer::DeltaTime();
+        auto diff = desiredFrameTime - delta;
+        if(diff > 0)
+        {
+            sleepTimes[sleepIndex++] = diff;
+            if(sleepIndex >= timePoints)
+            {
+                std::cout << "Average sleep time over " << timePoints << " frames: ";
+                auto average = 0.0;
+                for(auto i = 0; i < timePoints; ++i)
+                    average += sleepTimes[i];
+
+                std::cout << average/timePoints * 1000 << "ms" << std::endl;
+                sleepIndex = 0;
+            }
+            auto dur = std::chrono::duration<double>(diff);
+            std::this_thread::sleep_for(dur);
+        }
     }
 
-    //cleanup obj
-    puni::GameObject copyObj = testGO;
-    puni::GameObject::Destroy(copyObj);
-    puni::GameObject::Destroy(ground);
-    puni::ObjectAllocator::Instance()->addToDestroyQueue(obj);
+    std::cout << "Elapsed run time: " << puni::Timer::ElapsedTime() << " seconds" << std::endl;
+    std::cout << "Size of int: " << sizeof(int) << std::endl;
+    std::cout << "Size of long long: " << sizeof(long long) << std::endl;
+    std::cout << "Size of double: " << sizeof(double) << std::endl;
+    std::cout << "Size of long double: " << sizeof(long double) << std::endl;
+    std::cout << "Size of size_t: " << sizeof(size_t) << std::endl;
+    if(sizeof(size_t) == 4)
+        std::cout << "size_t is 4 bytes. Most likely on a 32bit architecture." << std::endl;
+    else if(sizeof(size_t) == 8)
+        std::cout << "size_t is 8 bytes. Most likely on a 64bit architecture." << std::endl;
+    else
+        std::cout << "size_t is " << sizeof(size_t) << " bytes(" << sizeof(size_t)*8 << "bits). Unknown architecture." << std::endl;
+
+    std::cout << "Max Hardware Concurrency Threads: " << std::thread::hardware_concurrency() << std::endl;        
     // Deinitialize our scene
     sceneExit();
-    printf("Double checking object queue.\n\n\n");
-    puni::ObjectAllocator::Instance()->processDestroyQueue();
-    // Deinitialize EGL
-    printf("Destroying gl instance.\n\n\n");
-    glInstance->DestroySelf();
-    //deinitEgl();
-    printf("Bye bye.\n\n\n");
+
+    puni::Shader::CleanUpShaderCache();
     return EXIT_SUCCESS;
 }

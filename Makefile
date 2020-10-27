@@ -45,7 +45,11 @@ INCLUDES	:=	include
 ROMFS		:=	romfs
 APP_TITLE	:=	nx-puni-gl
 APP_AUTHOR	:=	Moehammered
+<<<<<<< HEAD
 APP_VERSION	:=	0.2.9
+=======
+APP_VERSION	:=	0.1.5
+>>>>>>> base-framework
 
 
 #---------------------------------------------------------------------------------
@@ -63,7 +67,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions #-fexceptions
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lglad -lEGL -lglapi -ldrm_nouveau -lnx
+LIBS	:= -lglfw3 -lEGL -lglapi -ldrm_nouveau -lnx -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

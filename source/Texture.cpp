@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "stb_image.h"
-#include <glad\glad.h>
+#include <glad/glad.h>
+#include <iostream>
 
 puni::Texture::Texture()
 {
@@ -18,7 +19,11 @@ puni::Texture::Texture(std::string path)
 
 puni::Texture::~Texture()
 {
-	glDeleteTextures(1, &textureID);
+	// printf("Destroying Texture.\n\n");
+	// printf("Deleting gl texture ID.\n\n");
+	if(textureID)
+		glDeleteTextures(1, &textureID);
+	// printf("Destroyed Texture.\n\n");
 }
 
 const int puni::Texture::Width()
@@ -67,7 +72,7 @@ void puni::Texture::loadTexture(std::string const& path)
 	}
 	else
 	{
-		printf("Error loading texture: %s\n\n", path.c_str());
+		std::cout << "Error loading texture: " << path << std::endl;
 	}
 }
 
