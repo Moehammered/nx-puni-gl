@@ -45,11 +45,7 @@ INCLUDES	:=	include
 ROMFS		:=	romfs
 APP_TITLE	:=	nx-puni-gl
 APP_AUTHOR	:=	Moehammered
-<<<<<<< HEAD
-APP_VERSION	:=	0.2.9
-=======
 APP_VERSION	:=	0.1.5
->>>>>>> base-framework
 
 
 #---------------------------------------------------------------------------------
