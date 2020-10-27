@@ -1,5 +1,5 @@
-#ifndef MESH__H_
-#define MESH__H_
+#ifndef SWITCH__MESH__H_
+#define SWITCH__MESH__H_
 
 #include "Vertex.h"
 #include <vector>

@@ -10,8 +10,6 @@ It includes helper components and classes to make the process of using OpenGL ea
 
 The project will expand mostly into a rendering framework with some helper tools. Also it will incorporate the Entity Component Architecture style of Unity based from my PC version of this project.
 
-I will branch this out and focus first on making as small and minimal a framework as possible, then once it has been polished up and use case tested, merge it into the ECA(entity component architecture) branch.
-
 ## Extra unnecessary background info
 
 The name puni comes from my initial naming scheme of "PseudoUnity" but that is too long and annoying.
