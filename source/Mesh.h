@@ -13,7 +13,6 @@ namespace puni
 		public:
 			Mesh();
 			Mesh(const Mesh& mesh);
-			virtual ~Mesh();
 
 			virtual void setVertices(const Vertex * vertices, unsigned int vertexCount);
 			virtual void setIndices(const int * indices, unsigned int indexCount);

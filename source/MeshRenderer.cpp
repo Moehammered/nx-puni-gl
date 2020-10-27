@@ -2,16 +2,6 @@
 #include "PrimitiveShapes.h"
 #include "Camera.h"
 
-puni::MeshRenderer::MeshRenderer()
-{
-}
-
-
-puni::MeshRenderer::~MeshRenderer()
-{
-	//printf("Destroying MeshRenderer.\n\n");
-}
-
 const puni::Mesh & puni::MeshRenderer::getMesh()
 {
 	// TODO: insert return statement here

@@ -10,6 +10,8 @@ It includes helper components and classes to make the process of using OpenGL ea
 
 The project will expand mostly into a rendering framework with some helper tools. Also it will incorporate the Entity Component Architecture style of Unity based from my PC version of this project.
 
+(Uses TinyObjLoader to load OBJ files. Glad, GLM, and GLFW for OpenGL. stb_image for loading image files to be used as OpenGL textures.)
+
 ## Extra unnecessary background info
 
 The name puni comes from my initial naming scheme of "PseudoUnity" but that is too long and annoying.

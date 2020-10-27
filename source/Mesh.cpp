@@ -40,12 +40,6 @@ void puni::Mesh::operator=(const Mesh& mesh)
 	// printf("Mesh assignment operator called.\n\n");
 }
 
-puni::Mesh::~Mesh()
-{
-	vertices.clear();
-	indices.clear();
-}
-
 void puni::Mesh::setVertices(const Vertex * vertices, unsigned int vertexCount)
 {
 	updateFlag = updateFlag | VERT_BUFFER_DATA_BIT;
