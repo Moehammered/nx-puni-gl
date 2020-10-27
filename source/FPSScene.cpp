@@ -1,23 +1,16 @@
 #include "FPSScene.h"
 #include "PrimitiveShapes.h"
 #include <string>
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
 #include "Input.h"
 #include "Timer.h"
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm\gtx\norm.hpp>
-
-puni::FPSScene::FPSScene() { }
-
-puni::FPSScene::~FPSScene() 
-{ 
-    printf("FPSScene destructor called.\n\n");
-}
+#include <glm/gtx/norm.hpp>
+#include <math.h>
 
 void puni::FPSScene::cleanup()
 {
-    printf("Cleaning up FPSScene.\n\n");
+    std::cout << "Cleaning up FPSScene.\n" << std::endl;
 }
 
 void puni::FPSScene::initialise()
@@ -33,7 +26,10 @@ void puni::FPSScene::start()
 
 void puni::FPSScene::update()
 {
+#ifndef __SWITCH__
     checkInput();
+#endif
+    checkController();
 }
 
 void puni::FPSScene::draw()
@@ -47,7 +43,8 @@ void puni::FPSScene::setupScene()
     //player vars
     movementSpeed = 10;
     rotationSpeed = 120;
-    stickDeadZone = 0.3;
+    stickDeadZone = 0.1;
+    sensitivity = 3;
     //material setup
     puni::VertexAttributes vertAttribs[] = {
         {
@@ -63,43 +60,107 @@ void puni::FPSScene::setupScene()
             sizeof(puni::Vertex), (void*)offsetof(puni::Vertex, puni::Vertex::uv)
         }
     };
+#ifdef __SWITCH__
     std::string vertShaderPath = "romfs:/shaders/transform-coltex-shader.vs";
     std::string fragShaderPath = "romfs:/shaders/coltex-shader.fs";
     std::string plTexturePath = "romfs:/awesomeface.png";
     std::string grTexturePath = "romfs:/brick.jpg";
-    playerMaterial.loadShader(vertShaderPath, fragShaderPath);
-    playerMaterial.setAttributes(vertAttribs, 3);
-    playerMaterial.setTexture(new Texture(plTexturePath));
-    groundMaterial.loadShader(vertShaderPath, fragShaderPath);
-    groundMaterial.setAttributes(vertAttribs, 3);
-    groundMaterial.setTexture(new Texture(grTexturePath));
+    auto modelPath = "romfs:/catbot.obj";
+    auto modelTexturePath = "romfs:/catbot.png";
+#elif __WINDOWS__
+    std::string vertShaderPath = "romfs/shaders/transform-coltex-shader.vs";
+    std::string fragShaderPath = "romfs/shaders/coltex-shader.fs";
+    std::string plTexturePath = "romfs/catbot.png";
+    std::string grTexturePath = "romfs/brick.jpg";
+    auto modelPath = "romfs/catbot.obj";
+    auto modelTexturePath = "romfs/catbot.png";
+#endif
+    playerMaterial = new Material();
+    playerMaterial->loadShader(vertShaderPath, fragShaderPath);
+    playerMaterial->setAttributes(vertAttribs, 3);
+    playerMaterial->setTexture(new Texture(modelTexturePath));
+    groundMaterial = new Material();
+    groundMaterial->loadShader(vertShaderPath, fragShaderPath);
+    groundMaterial->setAttributes(vertAttribs, 3);
+    groundMaterial->setTexture(new Texture(grTexturePath));
 
+    auto mesh = puni::Mesh::LoadFromOBJ(modelPath);
     //setup renderers
-    plRenderer.setMesh(PrimitiveShapes::CreateCube());
-    plRenderer.setMaterial(playerMaterial);
+    plRenderer.setMesh(mesh);
+    //plRenderer.setMesh(PrimitiveShapes::CreateCube());
+    plRenderer.setMaterial(*playerMaterial);
     grRenderer.setMesh(PrimitiveShapes::CreateXZPlane());
-    grRenderer.setMaterial(groundMaterial);
+    grRenderer.setMaterial(*groundMaterial);
 
     //setup transforms
     grTr.scale = glm::vec3(8.0f, 8.0f, 8.0f);
     plTr.position = glm::vec3(0.0f, 0.5f, 0.0f);
-    plTr.scale = glm::vec3(3.0f, 3.0f, 3.0f);
+    plTr.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
 void puni::FPSScene::checkInput()
 {
-    JoystickPosition lJoy = Input::ReadLeftStick();
+    glm::vec3 moveDir = glm::vec3(0,0,0);
+    if(Input::IsKeyHeld(GLFW_KEY_W))
+        moveDir += plTr.Forward();
+    else if(Input::IsKeyHeld(GLFW_KEY_S))
+        moveDir -= plTr.Forward();
+    if(Input::IsKeyHeld(GLFW_KEY_A))
+        moveDir -= plTr.Right();
+    else if(Input::IsKeyHeld(GLFW_KEY_D))
+        moveDir += plTr.Right();
+
+    if(glm::length2(moveDir) > 0.4f)
+    {
+        moveDir = glm::normalize(moveDir);
+        plTr.position += moveDir * movementSpeed * Timer::DeltaTime();
+    }
+    // auto lJoy = Input::RawMouseMovementDelta();
+    // bool move = false;
+    // glm::vec3 moveDir = glm::vec3(0,0,0);
+    // if(abs(lJoy.x) > stickDeadZone)
+    // {
+    //     move = true;
+    //     moveDir += plTr.Right() * (float)lJoy.x;
+    // }
+    // if(abs(lJoy.y) > stickDeadZone)
+    // {
+    //     move = true;
+    //     moveDir += plTr.Forward() * (float)lJoy.y;
+    // }
+    // if(move)
+    // {
+    //     if(glm::length2(moveDir) > stickDeadZone*stickDeadZone)
+    //     {
+    //         moveDir = glm::normalize(moveDir);
+    //         plTr.position += moveDir * movementSpeed * Timer::DeltaTime();
+    //     }
+    // }
+    // move = false;
+    auto rJoy = Input::RawMouseMovementDelta();
+    glm::vec3 angle = glm::vec3(0,-rJoy.x,0.0f);
+    if(glm::length2(angle) > 0.1f)
+    {
+        angle = glm::normalize(angle);
+        plTr.rotate(angle, sensitivity * rotationSpeed * Timer::DeltaTime());
+    }
+}
+
+void puni::FPSScene::checkController()
+{
+    auto lJoy = Input::LeftAnalogAxes();
     bool move = false;
     glm::vec3 moveDir = glm::vec3(0,0,0);
-    if(abs(lJoy.dx) > stickDeadZone)
+    
+    if(abs(lJoy.x) > stickDeadZone)
     {
         move = true;
-        moveDir += plTr.Right() * (float)lJoy.dx;
+        moveDir += plTr.Right() * (float)lJoy.x;
     }
-    if(abs(lJoy.dy) > stickDeadZone)
+    if(abs(lJoy.y) > stickDeadZone)
     {
         move = true;
-        moveDir += plTr.Forward() * (float)lJoy.dy;
+        moveDir += plTr.Forward() * (float)lJoy.y;
     }
     if(move)
     {
@@ -109,17 +170,17 @@ void puni::FPSScene::checkInput()
             plTr.position += moveDir * movementSpeed * Timer::DeltaTime();
         }
     }
-    // move = false;
-    JoystickPosition rJoy = Input::ReadRightStick();
-    glm::vec3 angle = glm::vec3(rJoy.dy,-rJoy.dx,0.0f);
-    if(abs(rJoy.dx) > stickDeadZone)
+    move = false;
+    auto rJoy = Input::RightAnalogAxes();
+    glm::vec3 angle = glm::vec3(0,-rJoy.x,0.0f);
+    if(glm::length2(angle) > 0.1f)
     {
-        if(glm::length2(angle) > stickDeadZone*stickDeadZone)
-        {
-            angle = glm::normalize(angle);
-            plTr.rotate(angle, rotationSpeed * Timer::DeltaTime());
-        }
+        angle = glm::normalize(angle);
+        plTr.rotate(angle, sensitivity * rotationSpeed * Timer::DeltaTime());
     }
+
+    if(puni::Input::IsButtonPressed(GLFW_GAMEPAD_BUTTON_X))
+        plTr.position = glm::vec3(0.0f, 0.5f, 0.0f);
 }
 
 void puni::FPSScene::setupCamera()

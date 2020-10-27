@@ -1,7 +1,7 @@
 #ifndef CAMERA__H_
 #define CAMERA__H_
 
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 #include "Transform.h"
 
 namespace puni

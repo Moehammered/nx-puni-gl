@@ -3,6 +3,7 @@
 
 #include "Vertex.h"
 #include <vector>
+#include <string>
 #include "VertexArrayObject.h"
 
 namespace puni
@@ -28,6 +29,8 @@ namespace puni
 
 			const Vertex* const Vertices();
 			const int* const Indices();
+
+			static Mesh LoadFromOBJ(std::string file);
 
 			void operator =(const Mesh& mesh);
 

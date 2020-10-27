@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "stb_image.h"
-#include <glad\glad.h>
+#include <glad/glad.h>
+#include <iostream>
 
 puni::Texture::Texture()
 {
@@ -71,7 +72,7 @@ void puni::Texture::loadTexture(std::string const& path)
 	}
 	else
 	{
-		printf("Error loading texture: %s\n\n", path.c_str());
+		std::cout << "Error loading texture: " << path << std::endl;
 	}
 }
 

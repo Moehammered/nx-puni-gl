@@ -1,7 +1,7 @@
 #include "Material.h"
 
-#include <glad\glad.h>
-#include <glm\gtc\type_ptr.hpp>
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include "Vertex.h"
 
 puni::Material::Material()
@@ -32,9 +32,11 @@ puni::Material::~Material()
 {
 	// printf("Destroying Material.\n\n");
 	// printf("Deleting Shader in Material.\n\n");
-	delete shader;
+	if(shader != nullptr)
+		delete shader;
 	// printf("Deleting Texture in Material.\n\n");
-	delete texture;
+	if(texture != nullptr)
+		delete texture;
 	// printf("Destroyed Material.\n\n");
 }
 

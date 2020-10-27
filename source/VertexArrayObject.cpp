@@ -43,8 +43,7 @@ void puni::VertexArrayObject::setupBuffers(const BufferProperty * const properti
 				break;
 			default: //skip it as it's unsupported for now
 				bufferID = 0;
-				printf("\nBuffer target[%i] not yet supported. Skipping setup.\n\n",
-					prop.bufferTarget);
+				std::cout << "\nBuffer target[" << prop.bufferTarget << "] not yet supported. Skipping setup.\n" << std::endl;
 				printBufferProperty(prop);
 				continue;
 		}
@@ -115,7 +114,7 @@ void puni::VertexArrayObject::resizeBuffer(GLenum target, GLsizeiptr newSize)
 			glBindBuffer(target, 0);
 			break;
 		default: //skip it as it's unsupported for now
-			std::cout << "UNSUPPORTED TARGET BUFFER TYPE TO RESIZE!\n\n";
+			std::cout << "UNSUPPORTED TARGET BUFFER TYPE TO RESIZE!\n" << std::endl;
 			return;
 	}
 }
@@ -142,7 +141,7 @@ void puni::VertexArrayObject::copyDataToBuffer(GLenum target, const GLvoid * dat
 		glBindBuffer(target, 0);
 		break;
 	default: //skip it as it's unsupported for now
-		std::cout << "UNSUPPORTED TYPE TO COPY DATA TO BUFFER!\n\n";
+		std::cout << "UNSUPPORTED TYPE TO COPY DATA TO BUFFER!\n" << std::endl;
 		return;
 	}
 }

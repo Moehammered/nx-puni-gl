@@ -11,8 +11,6 @@ namespace puni
         public Scene
     {
     public:
-        FPSScene();
-        ~FPSScene();
 
         void initialise() override;
         void start() override;
@@ -23,11 +21,18 @@ namespace puni
     protected:
         void setupScene();
         void checkInput();
+        void checkController();
         void setupCamera();
 
         float           movementSpeed, rotationSpeed;
+        float           sensitivity;
         double          stickDeadZone;
-        Material        groundMaterial, playerMaterial;
+        //need to fix how deletion is handled so having value members works
+        //if a material is copied then the member goes out of scope it will
+        //destroy the shader. Either shaders are pre-compiled and referenced
+        //then destroyed at the end when the framework cleans up
+        //or the copying mechanism needs to be done differently.
+        Material        *groundMaterial, *playerMaterial;
         MeshRenderer    plRenderer, grRenderer;
         Transform       grTr, plTr;
     };

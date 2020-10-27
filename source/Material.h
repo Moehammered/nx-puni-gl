@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "VertexArrayObject.h"
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 

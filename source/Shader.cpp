@@ -1,8 +1,11 @@
 #include "Shader.h"
 
-#include <glad\glad.h>
+#include <glad/glad.h>
 #include "FileLoader.h"
 #include <iostream>
+
+std::unordered_map<std::string, int> puni::Shader::SHADER_CACHE;
+std::unordered_map<int64_t, int> puni::Shader::MATERIAL_CACHE;
 
 void printShaderError(std::string errmsg)
 {
@@ -73,53 +76,99 @@ void puni::Shader::compile(std::string vertexShaderPath, std::string fragmentSha
 		glDeleteProgram(shaderID);
 		shaderID = 0;
 	}
-	std::string vertexShader, fragmentShader;
+	auto vertexID = 0;
 
-	vertexShader = loadTextFile(vertexShaderPath);
-	fragmentShader = loadTextFile(fragmentShaderPath);
-
-	GLuint vertexID, fragmentID;
-	const GLchar * vS = vertexShader.c_str();
-	const GLchar* fS = fragmentShader.c_str();
-
-	int compileStatus;
-	char errLog[512];
-
-	vertexID = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexID, 1, &vS, NULL);
-	glCompileShader(vertexID);
-	glGetShaderiv(vertexID, GL_COMPILE_STATUS, &compileStatus);
-
-	if (!compileStatus)
+	if(SHADER_CACHE.find(vertexShaderPath) != SHADER_CACHE.end())
 	{
-		glGetShaderInfoLog(vertexID, 512, NULL, errLog);
-		printShaderError(errLog);
+		//we have it compiled already
+		vertexID = SHADER_CACHE[vertexShaderPath];
+	}
+	else
+	{
+		std::string vertexShader = loadTextFile(vertexShaderPath);
+		const GLchar * vS = vertexShader.c_str();
+
+		vertexID = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertexID, 1, &vS, NULL);
+		glCompileShader(vertexID);
+		
+		int compileStatus;
+		char errLog[512];
+		glGetShaderiv(vertexID, GL_COMPILE_STATUS, &compileStatus);
+
+		if (!compileStatus)
+		{
+			glGetShaderInfoLog(vertexID, 512, NULL, errLog);
+			printShaderError(errLog);
+		}
+		else
+			SHADER_CACHE[vertexShaderPath] = vertexID;
 	}
 
-	fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentID, 1, &fS, NULL);
-	glCompileShader(fragmentID);
-	glGetShaderiv(fragmentID, GL_COMPILE_STATUS, &compileStatus);
-
-	if (!compileStatus)
+	auto fragmentID = 0;
+	if(SHADER_CACHE.find(fragmentShaderPath) != SHADER_CACHE.end())
 	{
-		glGetShaderInfoLog(fragmentID, 512, NULL, errLog);
-		printShaderError(errLog);
+		//we have it compiled already
+		fragmentID = SHADER_CACHE[fragmentShaderPath];
 	}
-
-	shaderID = glCreateProgram();
-	glAttachShader(shaderID, vertexID);
-	glAttachShader(shaderID, fragmentID);
-	glLinkProgram(shaderID);
-
-	glGetProgramiv(shaderID, GL_LINK_STATUS, &compileStatus);
-	if (!compileStatus)
+	else
 	{
-		glGetProgramInfoLog(shaderID, 512, NULL, errLog);
-		printShaderError(errLog);
-	}
+		std::string	fragmentShader = loadTextFile(fragmentShaderPath);
+		const GLchar* fS = fragmentShader.c_str();
 
-	// delete the shaders as they're linked into our program now and no longer necessery
-	glDeleteShader(vertexID);
-	glDeleteShader(fragmentID);
+		fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragmentID, 1, &fS, NULL);
+		glCompileShader(fragmentID);
+
+		int compileStatus;
+		char errLog[512];
+		glGetShaderiv(fragmentID, GL_COMPILE_STATUS, &compileStatus);
+		if (!compileStatus)
+		{
+			glGetShaderInfoLog(fragmentID, 512, NULL, errLog);
+			printShaderError(errLog);
+		}
+		else
+			SHADER_CACHE[fragmentShaderPath] = fragmentID;
+	}
+	
+	int64_t matID = vertexID;
+	matID = matID << 32;
+	matID = matID | fragmentID;
+	
+	if(MATERIAL_CACHE.find(matID) != MATERIAL_CACHE.end())
+		shaderID = MATERIAL_CACHE[matID];
+	else
+	{
+		shaderID = glCreateProgram();
+		glAttachShader(shaderID, vertexID);
+		glAttachShader(shaderID, fragmentID);
+		glLinkProgram(shaderID);
+
+		int compileStatus;
+		char errLog[512];
+
+		glGetProgramiv(shaderID, GL_LINK_STATUS, &compileStatus);
+		if (!compileStatus)
+		{
+			glGetProgramInfoLog(shaderID, 512, NULL, errLog);
+			printShaderError(errLog);
+		}
+		else
+			MATERIAL_CACHE[matID] = shaderID;
+	}
+}
+
+
+void puni::Shader::CleanUpShaderCache()
+{
+	for(auto& id : SHADER_CACHE)
+		glDeleteShader(id.second);
+
+	SHADER_CACHE.clear();
+
+	for(auto& id : MATERIAL_CACHE)
+		glDeleteProgram(id.second);
+
+	MATERIAL_CACHE.clear();
 }

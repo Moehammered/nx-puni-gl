@@ -1,39 +1,37 @@
 #include "OpenGLLoader.h"
-#include <stdio.h>
+#include <iostream>
 
-void printEGLErrorCode()
+// puni::OpenGLLoader* puni::OpenGLLoader::_instance = nullptr;
+
+puni::OpenGLLoader& puni::OpenGLLoader::Instance()
 {
-    printf("EGL error code: %d\n\n", eglGetError());
+    static OpenGLLoader instance;
+
+    return instance;
 }
 
-void printError(std::string msg)
+void puni::OpenGLLoader::setWindowSize(int x, int y)
 {
-    printf("ERROR::OPENGLLOADER - %s\n\n", msg.c_str());
+	screenHeight = y;
+	screenWidth = x;
 }
 
-puni::OpenGLLoader* puni::OpenGLLoader::_instance = nullptr;
-
-puni::OpenGLLoader* const puni::OpenGLLoader::Instance()
+void puni::OpenGLLoader::setWindowResizeEvent(GLFWframebuffersizefun callback)
 {
-    if(!_instance)
-        _instance = new OpenGLLoader();
-
-    return _instance;
+	if(windowHandle)
+		glfwSetFramebufferSizeCallback(windowHandle, callback);
 }
 
-EGLDisplay& puni::OpenGLLoader::Display()
+GLFWwindow* const puni::OpenGLLoader::getWindow()
 {
-    return display;
+	return windowHandle;
 }
 
-EGLSurface& puni::OpenGLLoader::Surface()
+void puni::OpenGLLoader::onWindowResizeCallback(GLFWwindow * window, int width, int height)
 {
-    return surface;
-}
-
-EGLContext& puni::OpenGLLoader::Context()
-{
-    return context;
+	Instance().screenHeight = height;
+	Instance().screenWidth = width;
+	glViewport(0, 0, width, height);
 }
 
 unsigned int puni::OpenGLLoader::ScreenWidth()
@@ -46,116 +44,63 @@ unsigned int puni::OpenGLLoader::ScreenHeight()
     return screenHeight;
 }
 
+void glfwcallback_error(int error_code, const char* desc)
+{
+    std::cout << "GLFW Error: " << error_code << ", " << desc << std::endl;
+}
+
 bool puni::OpenGLLoader::initialiseOpenGL()
 {
-    windowHandle = nwindowGetDefault();
-
-    if(!windowHandle)
+    //initialise glfw
+	glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
+    if(!glfwInit())
     {
-        printf("ERROR::OPENGLLOADER - Window Handle null/failed init.\n\n");
+        std::cout << "GLFWInit failed." << std::endl;
+        return false;
+    }
+    
+    glfwSetErrorCallback(glfwcallback_error);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majVersion);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minVersion);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, glProfile);
+
+    std::cout << "GLFW CONTEXT VERS MAJ: " << majVersion << std::endl;
+    std::cout << "GLFW CONTEXT VERS MIN: " << minVersion << std::endl;
+    std::cout << "GLFW OPENGL PROFILE: " << glProfile << std::endl;
+
+    //create the window
+    windowHandle = glfwCreateWindow(screenWidth, screenHeight,
+        title.c_str(), nullptr, nullptr);
+    if (!windowHandle)
+    {
+        glfwTerminate();
+        std::cout << "failed to create window handle" << std::endl;
         return false;
     }
 
-    if(initEGL())
+    //make it current
+    glfwMakeContextCurrent(windowHandle);
+
+    //load GLAD
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        gladLoadGL();
-        nwindowGetDimensions(windowHandle, &screenWidth, &screenHeight);
-    }
-    else
-    {
-        printError("EGL initialisation failed. Shutting down.");
+        std::cout << "failed to load GLAD" << std::endl;
         return false;
     }
+
+    //set the viewport
+    glViewport(0, 0, screenWidth, screenHeight);
+
+    setWindowResizeEvent(puni::OpenGLLoader::onWindowResizeCallback);
+
+    std::cout << "OpenGL Version: " << glGetString(GL_VERSION);
+    std::cout << " || GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     return true;
 }
 
-bool puni::OpenGLLoader::initEGL()
-{
-    //get display context
-    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if(!display)
-    {
-        //printf("ERROR::OPENGLLOADER - display failed init/connection.\n\n");
-        printError("display failed init/connection.");
-        return false;
-    }
-    //initialise display connection
-    eglInitialize(display, &(minVersion), &(majVersion)); //replace with nullptr if errors
-
-    if(eglBindAPI(EGL_OPENGL_API) == EGL_FALSE)
-    {
-        //printf("ERROR::OPENGLLOADER - API failed to bind.\n\n%d\n\n", eglGetError());
-        printError("API failed to bind.");
-        //printf("EGL error code: %d\n\n", eglGetError());
-        printEGLErrorCode();
-        return false;
-    }
-
-    //configure EGL framebuffer
-    EGLConfig config;
-    EGLint numConfigs;
-    static const EGLint framebufferAttribList[] = {
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-        EGL_RED_SIZE,     8,
-        EGL_GREEN_SIZE,   8,
-        EGL_BLUE_SIZE,    8,
-        EGL_ALPHA_SIZE,   8,
-        EGL_DEPTH_SIZE,   24,
-        EGL_STENCIL_SIZE, 8,
-        EGL_NONE
-    };
-    eglChooseConfig(display, framebufferAttribList, &config, 1, &numConfigs);
-
-    if(numConfigs == 0)
-    {
-        printError("No config found.");
-        printEGLErrorCode();
-        return false;
-    }
-
-    //create a GL window surface now
-    surface = eglCreateWindowSurface(display, config, windowHandle, nullptr);
-    if(!surface)
-    {
-        printError("GL surface failed creation.");
-        printEGLErrorCode();
-        return false;
-    }
-
-    //create a render context
-    static const EGLint contextAttribList[] = {
-        EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR, glProfile,
-        EGL_CONTEXT_MAJOR_VERSION_KHR, majVersion,
-        EGL_CONTEXT_MINOR_VERSION_KHR, minVersion,
-        EGL_NONE
-    };
-    context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttribList);
-    if(!context)
-    {
-        printError("GL Context failed creation.");
-        printEGLErrorCode();
-        return false;
-    }
-
-    //finally setup the current context and make it active
-    if(eglMakeCurrent(display, surface, surface, context) == EGL_FALSE)
-    {
-        printError("Making context current messed up somehow.");
-        printEGLErrorCode();
-        return false;
-    }
-
-    //survived the init process
-    return true;
-}
-
-void puni::OpenGLLoader::DestroySelf()
-{
-    if(_instance)
-        delete _instance;
-}
-
+#ifdef __SWITCH__
 void puni::OpenGLLoader::initMesaConfig()
 {
     // Uncomment below to disable error checking and save CPU time (useful for production):
@@ -171,41 +116,20 @@ void puni::OpenGLLoader::initMesaConfig()
     //setenv("NV50_PROG_DEBUG", "1", 1);
     //setenv("NV50_PROG_CHIPSET", "0x120", 1);
 }
+#endif
 
 puni::OpenGLLoader::OpenGLLoader()
 {
-    screenWidth = 800;
-    screenHeight = 600;
+    screenWidth = 1280;
+    screenHeight = 720;
     minVersion = 3;
     majVersion = 4;
-    glProfile = EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR;
+    glProfile = GLFW_OPENGL_CORE_PROFILE;
 
     title = "puni::miniframework-opengl";
 }
 
 puni::OpenGLLoader::~OpenGLLoader()
 {
-    printf("Destroying GLLoader\n\n");
-    if (display)
-    {
-        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-        if (context)
-        {
-            eglDestroyContext(display, context);
-            context = nullptr;
-        }
-        if (surface)
-        {
-            eglDestroySurface(display, surface);
-            surface = nullptr;
-        }
-        eglTerminate(display);
-        display = nullptr;
-    }
-
-    // if(_instance)
-    //     delete _instance;
-    _instance = nullptr;
-
-    printf("Finished destruction\n\n");
+    glfwTerminate();
 }
