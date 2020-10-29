@@ -9,9 +9,6 @@ namespace puni
 	class MeshRenderer
 	{
 	public:
-		MeshRenderer();
-		~MeshRenderer();
-
 		const Mesh& getMesh();
 		void updateMaterialAttributes(const VertexAttributes* attribs, unsigned int count);
 		void setMesh(const Mesh& newMesh);

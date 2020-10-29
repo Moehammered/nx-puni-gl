@@ -85,6 +85,4 @@ void puni::Camera::updateView()
 {
 	glm::vec3 lookat = transform.position + transform.Forward();
 	view = glm::lookAt(transform.position, lookat, transform.Up());
-	printf("Up vector: %s\n", glm::to_string(transform.Up()).c_str());
-	printf("View matrix:\n%s\n\n", glm::to_string(view).c_str());
 }

@@ -7,7 +7,6 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/dual_quaternion.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
 
@@ -85,8 +84,6 @@ void puni::Transform::translate(glm::vec3 delta)
 void puni::Transform::rotate(glm::vec3 axis, float angle)
 {
 	glm::quat newRot = glm::angleAxis(glm::radians(angle), axis);
-	// std::cout << "Transform angle axis rot: " << newRot << std::endl;
-	printf("Transform angle axis rot:%s\n\n", glm::to_string(newRot).c_str());
 	Rotation(rotation * newRot);
 }
 
